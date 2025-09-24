@@ -2,7 +2,7 @@
 ## Team Introduction
 Hello
 - Lecturer
-    - `Scott Uk-Jin Lee`
+    - `Scott UK-Jin Lee`
 - Teaching Assistants
     - `Joonwoo Lee`
     - `Seungho Kim`

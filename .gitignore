@@ -162,6 +162,13 @@ pip-log.txt
 # Mac crap
 .DS_Store
 
+#################
+## INTELLIJ IDEA
+#################
+.idea
+*.iml
+out
+
 #############
 ## Custom
 #############
