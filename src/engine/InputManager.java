@@ -82,11 +82,4 @@ public final class InputManager implements KeyListener {
 
 	}
 
-	public boolean isP1KeyDown(int keyCode) {
-		return isKeyDown(keyCode);
-	}
-
-	public boolean isP2KeyDown(int keyCode) {
-		return isKeyDown(keyCode);
-	}
 }

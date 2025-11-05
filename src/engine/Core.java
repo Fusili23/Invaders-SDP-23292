@@ -88,12 +88,12 @@ public final class Core {
 		int height = frame.getHeight();
 
 		levelManager = new LevelManager();
-		GameState gameState = new GameState(1, 0, MAX_LIVES, MAX_LIVES, 0, 0,0);
+		GameState gameState = new GameState(1, 0, MAX_LIVES, 0, 0, 0);
 
 
         int returnCode = 1;
 		do {
-            gameState = new GameState(1, 0, MAX_LIVES,MAX_LIVES, 0, 0,gameState.getCoin());
+            gameState = new GameState(1, 0, MAX_LIVES, 0, 0,gameState.getCoin());
 			switch (returnCode) {
                 case 1:
                     // Main menu.
@@ -144,7 +144,7 @@ public final class Core {
                         frame.setScreen(currentScreen);
                         LOGGER.info("Closing game screen.");
                         gameState = ((GameScreen) currentScreen).getGameState();
-                        if (gameState.getLivesRemaining() > 0 || gameState.getLivesRemainingP2() > 0) {
+                        if (gameState.getLivesRemaining() > 0) {
 							SoundManager.stopAll();
 							SoundManager.play("sfx/levelup.wav");
 
@@ -161,14 +161,13 @@ public final class Core {
                                     gameState.getLevel() + 1,          // Increment level
                                     gameState.getScore(),              // Keep current score
                                     gameState.getLivesRemaining(),     // Keep remaining lives
-									gameState.getLivesRemainingP2(),   // Keep remaining livesP2
                                     gameState.getBulletsShot(),        // Keep bullets fired
                                     gameState.getShipsDestroyed(),     // Keep ships destroyed
                                     gameState.getCoin()                // Keep current coins
                             );
                         }
                         // Loop while player still has lives and levels remaining
-                    } while (gameState.getLivesRemaining() > 0 || gameState.getLivesRemainingP2() > 0);
+                    } while (gameState.getLivesRemaining() > 0);
 
 					SoundManager.stopAll();
 					SoundManager.play("sfx/gameover.wav");
