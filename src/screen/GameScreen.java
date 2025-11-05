@@ -15,7 +15,12 @@ import engine.GameTimer;
 import engine.AchievementManager;
 import engine.ItemHUDManager;
 import entity.*;
+import java.awt.event.KeyEvent;
+import java.util.HashSet;
+import java.util.Set;
+
 import engine.level.Level;
+import engine.level.LevelManager;
 
 /**
  * Implements the game screen, where the action happens.
@@ -50,6 +55,8 @@ public class GameScreen extends Screen {
 
     /** Current level data (direct from Level system). */
     private Level currentLevel;
+    /** Current difficulty level number. */
+    private int level;
 	/** Formation of enemy ships. */
 	private EnemyShipFormation enemyShipFormation;
 	/** Formation of special enemy ships. */
@@ -112,9 +119,23 @@ public class GameScreen extends Screen {
 
 	    private GameState gameState;
 
-	    /**
-	     * Constructor, establishes the properties of the screen.
-	     */
+    /**
+     * Constructor, establishes the properties of the screen.
+     *
+     * @param gameState
+     *            Current game state.	 * @param level
+     *            Current level settings.
+     * @param bonusLife
+     *            Checks if a bonus life is awarded this level.
+     * @param maxLives
+     *            Maximum number of lives.
+     * @param width
+     *            Screen width.
+     * @param height
+     *            Screen height.
+     * @param fps
+     *            Frames per second, frame rate at which the game is run.
+     */
 	public GameScreen(final GameState gameState,
 			final Level level, final boolean bonusLife, final int maxLives,
 			final int width, final int height, final int fps) {
@@ -139,6 +160,7 @@ public class GameScreen extends Screen {
 	 */
 	public final void initialize() {
 		super.initialize();
+        /** Initialize the bullet Boss fired */
 		this.bossBullets = new HashSet<>();
         enemyShipFormation = new EnemyShipFormation(this.currentLevel);
 		enemyShipFormation.attach(this);
@@ -168,6 +190,8 @@ public class GameScreen extends Screen {
 
 	/**
 	 * Starts the action.
+     *
+     * @return Next screen code.
 	 */
 	public final int run() {
 		super.run();
@@ -305,6 +329,8 @@ public class GameScreen extends Screen {
 
 		enemyShipSpecialFormation.draw();
 
+        /** draw final boss at the field */
+        /** draw final boss bullets */
 		if(this.finalBoss != null && !this.finalBoss.isDestroyed()){
 			for (BossBullet bossBullet : bossBullets) {
 				drawManager.drawEntity(bossBullet, bossBullet.getPositionX(), bossBullet.getPositionY());
@@ -634,6 +660,9 @@ public class GameScreen extends Screen {
 
     /**
      * Displays a notification popup when the player gains or loses health
+     *
+     *  @param message
+     *          Text to display in the popup
      */
 
     public void showHealthPopup(String message) {
@@ -644,12 +673,14 @@ public class GameScreen extends Screen {
 
     /**
 	 * Returns a GameState object representing the status of the game.
+     *
+     * @return Current game state.
 	 */
 	    public final GameState getGameState() {
 	        if (this.coin > 2000) {
 	            AchievementManager.getInstance().unlockAchievement("Mr. Greedy");
 	        }
-	        return new GameState(this.gameState.getLevel(), this.score, this.lives,
+	        return new GameState(this.level, this.score, this.lives,
 	                this.bulletsShot, this.shipsDestroyed,this.coin);
 	    }
 	/**
@@ -713,6 +744,7 @@ public class GameScreen extends Screen {
 				b.update();
 				/** If the bullet goes off the screen */
 				if (b.isOffScreen(width, height)) {
+                    /** bulletsToRemove carry bullet */
 					bulletsToRemove.add(b);
 				}
 				/** If the bullet collides with ship */
