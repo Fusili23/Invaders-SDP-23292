@@ -13,5 +13,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: List files
-      run: ls -R
+    - name: Create output directory
+      run: mkdir -p out/production/Invaders-SDP-23292
+    - name: Compile code
+      run: javac -d out/production/Invaders-SDP-23292 $(find src -name "*.java")
