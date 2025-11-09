@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.util.Collections;
 import java.awt.Color;
 
+import engine.level.EnemyType;
 import screen.Screen;
 import screen.GameScreen;
 import engine.Cooldown;
@@ -612,7 +612,7 @@ public class EnemyShipFormation implements Iterable<EnemyShip> {
         }
 
         int countA = 0, countB = 0, countC = 0;
-        for (engine.level.EnemyType t : level.getEnemyTypes()) {
+        for (EnemyType t : level.getEnemyTypes()) {
             String kind = (t.getType() == null) ? "enemya" : t.getType().trim().toLowerCase();
             int cnt = Math.max(0, t.getCount());
             switch (kind) {

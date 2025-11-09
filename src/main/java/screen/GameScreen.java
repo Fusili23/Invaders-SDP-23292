@@ -3,10 +3,8 @@ package screen;
 import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
-import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import engine.Cooldown;
 import engine.Core;
@@ -14,13 +12,11 @@ import engine.GameState;
 import engine.GameTimer;
 import engine.AchievementManager;
 import engine.ItemHUDManager;
-import entity.*;
-import java.awt.event.KeyEvent;
-import java.util.HashSet;
-import java.util.Set;
 
 import engine.level.Level;
-import engine.level.LevelManager;
+import engine.level.ItemDrop;
+//import main.audio.entity.*;
+import entity.*;
 
 
 /**
@@ -547,22 +543,22 @@ public class GameScreen extends Screen {
 						this.enemyShipFormation.destroy(enemyShip);
 						AchievementManager.getInstance().onEnemyDefeated();
 						if (enemyType != null && this.currentLevel.getItemDrops() != null) {
-							List<engine.level.ItemDrop> potentialDrops = new ArrayList<>();
-							for (engine.level.ItemDrop itemDrop : this.currentLevel.getItemDrops()) {
+							List<ItemDrop> potentialDrops = new ArrayList<>();
+							for (ItemDrop itemDrop : this.currentLevel.getItemDrops()) {
 								if (enemyType.equals(itemDrop.getEnemyType())) {
 									potentialDrops.add(itemDrop);
 								}
 							}
 
-							List<engine.level.ItemDrop> successfulDrops = new ArrayList<>();
-							for (engine.level.ItemDrop itemDrop : potentialDrops) {
+							List<ItemDrop> successfulDrops = new ArrayList<>();
+							for (ItemDrop itemDrop : potentialDrops) {
 								if (Math.random() < itemDrop.getDropChance()) {
 									successfulDrops.add(itemDrop);
 								}
 							}
 
 							if (!successfulDrops.isEmpty()) {
-								engine.level.ItemDrop selectedDrop = successfulDrops.get((int) (Math.random() * successfulDrops.size()));
+								ItemDrop selectedDrop = successfulDrops.get((int) (Math.random() * successfulDrops.size()));
 								DropItem.ItemType droppedType = DropItem.fromString(selectedDrop.getItemId());
 								if (droppedType != null) {
 									final int ITEM_DROP_SPEED = 2;
