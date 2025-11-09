@@ -63,6 +63,8 @@ public class GameScreen extends Screen {
 	private EnemyShipSpecialFormation enemyShipSpecialFormation;
 	/** Player's ship. */
 	private Ship ship;
+	/** Player 2's ship. */
+	private Ship ship2;
 	/** Bonus enemy ship that appears sometimes. */
 	private EnemyShip enemyShipSpecial;
 	/** Minimum time between bonus ship appearances. */
@@ -83,8 +85,12 @@ public class GameScreen extends Screen {
 	private Set<DropItem> dropItems;
 	/** Current score. */
 	private int score;
+	/** Current score for player 2. */
+	private int scoreP2;
     /** Player lives left. */
 	private int lives;
+	/** Player 2 lives left. */
+	private int livesP2;
 	/** Total bullets shot by the player. */
 	private int bulletsShot;
 	/** Total ships destroyed by the player. */
@@ -99,6 +105,8 @@ public class GameScreen extends Screen {
 	private int maxLives;
 	/** Current coin. */
 	private int coin;
+	/** Is the game in two-player mode? */
+	private boolean isTwoPlayer;
 
     /** bossBullets carry bullets which Boss fires */
 	private Set<BossBullet> bossBullets;
@@ -142,17 +150,26 @@ public class GameScreen extends Screen {
 		super(width, height, fps);
 
         this.currentLevel = level;
+		this.level = gameState.getLevel();
 		this.bonusLife = bonusLife;
 		this.maxLives = maxLives;
         this.score = gameState.getScore();
         this.coin = gameState.getCoin();
 		this.lives = gameState.getLivesRemaining();
-		this.gameState = gameState;
 		if (this.bonusLife) {
 			this.lives++;
 		}
 		this.bulletsShot = gameState.getBulletsShot();
 		this.shipsDestroyed = gameState.getShipsDestroyed();
+		this.isTwoPlayer = gameState.isTwoPlayer();
+		if (this.isTwoPlayer) {
+			this.livesP2 = gameState.getLivesRemainingP2();
+			this.scoreP2 = gameState.getScoreP2();
+			if (this.bonusLife) {
+				this.livesP2++;
+			}
+		}
+		this.gameState = gameState;
 	}
 
 	/**
@@ -165,7 +182,14 @@ public class GameScreen extends Screen {
         enemyShipFormation = new EnemyShipFormation(this.currentLevel);
 		enemyShipFormation.attach(this);
         this.enemyShipFormation.applyEnemyColorByLevel(this.currentLevel);
-		this.ship = new Ship(this.width / 2, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
+		if (this.isTwoPlayer) {
+			this.ship = new Ship(this.width / 3, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
+			this.ship.setPlayerId(1);
+			this.ship2 = new Ship(this.width * 2 / 3, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.CYAN);
+			this.ship2.setPlayerId(2);
+		} else {
+			this.ship = new Ship(this.width / 2, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
+		}
 
         // special enemy initial
 		enemyShipSpecialFormation = new EnemyShipSpecialFormation(this.currentLevel,
@@ -214,11 +238,12 @@ public class GameScreen extends Screen {
 				this.gameTimer.start();
 			}
 
+			// Player 1 controls
 			if (!this.ship.isDestroyed()) {
-				boolean right = inputManager.isKeyDown(KeyEvent.VK_RIGHT);
-				boolean left  = inputManager.isKeyDown(KeyEvent.VK_LEFT);
-				boolean up    = inputManager.isKeyDown(KeyEvent.VK_UP);
-				boolean down  = inputManager.isKeyDown(KeyEvent.VK_DOWN);
+				boolean right = inputManager.isKeyDown(KeyEvent.VK_D);
+				boolean left  = inputManager.isKeyDown(KeyEvent.VK_A);
+				boolean up    = inputManager.isKeyDown(KeyEvent.VK_W);
+				boolean down  = inputManager.isKeyDown(KeyEvent.VK_S);
 				boolean fire  = inputManager.isKeyDown(KeyEvent.VK_SPACE);
 
 				boolean isRightBorder = this.ship.getPositionX()
@@ -238,6 +263,33 @@ public class GameScreen extends Screen {
 					AchievementManager.getInstance().onShotFired();
 				}
 			}
+
+			// Player 2 controls
+			if (this.isTwoPlayer && !this.ship2.isDestroyed()) {
+				boolean right = inputManager.isKeyDown(KeyEvent.VK_RIGHT);
+				boolean left  = inputManager.isKeyDown(KeyEvent.VK_LEFT);
+				boolean up    = inputManager.isKeyDown(KeyEvent.VK_UP);
+				boolean down  = inputManager.isKeyDown(KeyEvent.VK_DOWN);
+				boolean fire  = inputManager.isKeyDown(KeyEvent.VK_ENTER);
+
+				boolean isRightBorder = this.ship2.getPositionX()
+						+ this.ship2.getWidth() + this.ship2.getSpeed() > this.width - 1;
+				boolean isLeftBorder = this.ship2.getPositionX() - this.ship2.getSpeed() < 1;
+				boolean isUpBorder = this.ship2.getPositionY() - this.ship2.getSpeed() < SEPARATION_LINE_HEIGHT;
+				boolean isDownBorder = this.ship2.getPositionY()
+						+ this.ship2.getHeight() + this.ship2.getSpeed() > ITEMS_SEPARATION_LINE_HEIGHT;
+
+				if (right && !isRightBorder) this.ship2.moveRight();
+				if (left  && !isLeftBorder)  this.ship2.moveLeft();
+				if (up    && !isUpBorder)    this.ship2.moveUp();
+				if (down  && !isDownBorder)  this.ship2.moveDown();
+
+				if (fire && this.ship2.shoot(this.bullets)) {
+					this.bulletsShot++; // Shared for now
+					AchievementManager.getInstance().onShotFired();
+				}
+			}
+
 
 			switch (this.currentPhase) {
 				case wave:
@@ -279,6 +331,9 @@ public class GameScreen extends Screen {
 					break;
 			}
 			this.ship.update();
+			if (this.isTwoPlayer) {
+				this.ship2.update();
+			}
 			this.enemyShipSpecialFormation.update();
 		}
 
@@ -293,15 +348,18 @@ public class GameScreen extends Screen {
 		cleanBullets();
 		draw();
 
-		if (this.lives == 0 && !this.levelFinished) {
+		boolean allPlayersDead = this.lives == 0 && (!this.isTwoPlayer || this.livesP2 == 0);
+		if (allPlayersDead && !this.levelFinished) {
 			this.levelFinished = true;
 			this.screenFinishedCooldown.reset();
 			if (this.gameTimer.isRunning()) {
 				this.gameTimer.stop();
 			}
 		}
+
 		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
-			if (this.lives > 0) { // Check for win condition
+			boolean anyPlayerWon = this.lives > 0 || (this.isTwoPlayer && this.livesP2 > 0);
+			if (anyPlayerWon) { // Check for win condition
 				if (this.currentLevel.getCompletionBonus() != null) {
 					this.coin += this.currentLevel.getCompletionBonus().getCurrency();
 					this.logger.info("Awarded " + this.currentLevel.getCompletionBonus().getCurrency() + " coins for level completion.");
@@ -326,6 +384,10 @@ public class GameScreen extends Screen {
 
 		drawManager.drawEntity(this.ship, this.ship.getPositionX(),
 				this.ship.getPositionY());
+		if (this.isTwoPlayer) {
+			drawManager.drawEntity(this.ship2, this.ship2.getPositionX(),
+					this.ship2.getPositionY());
+		}
 
 		enemyShipSpecialFormation.draw();
 
@@ -352,9 +414,16 @@ public class GameScreen extends Screen {
 			drawManager.drawEntity(dropItem, dropItem.getPositionX(), dropItem.getPositionY());
 
 		// Interface.
-        drawManager.drawScore(this, this.score);
+		if (this.isTwoPlayer) {
+			drawManager.drawScore(this, this.score, 1);
+			drawManager.drawLives(this, this.lives, 1);
+			drawManager.drawScore(this, this.scoreP2, 2);
+			drawManager.drawLives(this, this.livesP2, 2);
+		} else {
+			drawManager.drawScore(this, this.score);
+			drawManager.drawLives(this, this.lives);
+		}
         drawManager.drawCoin(this,this.coin);
-		drawManager.drawLives(this, this.lives);
 		drawManager.drawTime(this, this.elapsedTime);
 		drawManager.drawItemsHUD(this);
 		drawManager.drawLevel(this, this.currentLevel.getLevelName());
@@ -428,29 +497,46 @@ public class GameScreen extends Screen {
 	private void manageBulletShipCollisions() {
 		Set<Bullet> recyclable = new HashSet<Bullet>();
 		for (Bullet bullet : this.bullets)
-			if (bullet.getSpeed() > 0) {
+			if (bullet.getSpeed() > 0) { // Enemy bullet
 				if (checkCollision(bullet, this.ship) && !this.levelFinished) {
 					recyclable.add(bullet);
 					if (!this.ship.isInvincible()) {
 						if (!this.ship.isDestroyed()) {
 							this.ship.destroy();
 							this.lives--;
-							showHealthPopup("-1 Health");
-							this.logger.info("Hit on player ship, " + this.lives
+							showHealthPopup("-1 Health (P1)");
+							this.logger.info("Hit on player 1 ship, " + this.lives
 									+ " lives remaining.");
 						}
 					}
 				}
-			} else {
+				if (this.isTwoPlayer && this.ship2 != null && checkCollision(bullet, this.ship2) && !this.levelFinished) {
+					recyclable.add(bullet);
+					if (!this.ship2.isInvincible()) {
+						if (!this.ship2.isDestroyed()) {
+							this.ship2.destroy();
+							this.livesP2--;
+							showHealthPopup("-1 Health (P2)");
+							this.logger.info("Hit on player 2 ship, " + this.livesP2
+									+ " lives remaining.");
+						}
+					}
+				}
+			} else { // Player bullet
 				for (EnemyShip enemyShip : this.enemyShipFormation)
 					if (!enemyShip.isDestroyed()
 							&& checkCollision(bullet, enemyShip)) {
-                        int pts = enemyShip.getPointValue();
-                        this.score += pts;
-                        this.coin += (pts / 10);
-                        this.shipsDestroyed++;
+						int pts = enemyShip.getPointValue();
+						Integer ownerId = bullet.getOwnerId();
+						if (ownerId != null && ownerId == 2) {
+							this.scoreP2 += pts;
+						} else {
+							this.score += pts;
+						}
+						this.coin += (pts / 10);
+						this.shipsDestroyed++;
 
-                        String enemyType = enemyShip.getEnemyType();
+						String enemyType = enemyShip.getEnemyType();
 						this.enemyShipFormation.destroy(enemyShip);
 						AchievementManager.getInstance().onEnemyDefeated();
 						if (enemyType != null && this.currentLevel.getItemDrops() != null) {
@@ -494,10 +580,15 @@ public class GameScreen extends Screen {
 				for (EnemyShip enemyShipSpecial : this.enemyShipSpecialFormation)
 					if (enemyShipSpecial != null && !enemyShipSpecial.isDestroyed()
 							&& checkCollision(bullet, enemyShipSpecial)) {
-                        int pts = enemyShipSpecial.getPointValue();
-                        this.score += pts;
-                        this.coin += (pts / 10);
-                        this.shipsDestroyed++;
+						int pts = enemyShipSpecial.getPointValue();
+						Integer ownerId = bullet.getOwnerId();
+						if (ownerId != null && ownerId == 2) {
+							this.scoreP2 += pts;
+						} else {
+							this.score += pts;
+						}
+						this.coin += (pts / 10);
+						this.shipsDestroyed++;
 						this.enemyShipSpecialFormation.destroy(enemyShipSpecial);
 						recyclable.add(bullet);
 					}
@@ -507,10 +598,15 @@ public class GameScreen extends Screen {
 					this.omegaBoss.takeDamage(2);
 					if(this.omegaBoss.getHealPoint() <= 0) {
 						this.shipsDestroyed++;
-                        int pts = this.omegaBoss.getPointValue();
-                        this.score += pts;
-                        this.coin += (pts / 10);
-                        this.omegaBoss.destroy();
+						int pts = this.omegaBoss.getPointValue();
+						Integer ownerId = bullet.getOwnerId();
+						if (ownerId != null && ownerId == 2) {
+							this.scoreP2 += pts;
+						} else {
+							this.score += pts;
+						}
+						this.coin += (pts / 10);
+						this.omegaBoss.destroy();
 						AchievementManager.getInstance().unlockAchievement("Boss Slayer");
 						this.bossExplosionCooldown.reset();
 					}
@@ -520,9 +616,14 @@ public class GameScreen extends Screen {
 				if(this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(bullet,this.finalBoss)){
 					this.finalBoss.takeDamage(1);
 					if(this.finalBoss.getHealPoint() <= 0){
-                        int pts = this.finalBoss.getPointValue();
-                        this.score += pts;
-                        this.coin += (pts / 10);
+						int pts = this.finalBoss.getPointValue();
+						Integer ownerId = bullet.getOwnerId();
+						if (ownerId != null && ownerId == 2) {
+							this.scoreP2 += pts;
+						} else {
+							this.score += pts;
+						}
+						this.coin += (pts / 10);
 						this.finalBoss.destroy();
                         AchievementManager.getInstance().unlockAchievement("Boss Slayer");
 					}
@@ -537,49 +638,78 @@ public class GameScreen extends Screen {
      * Manages collisions between player ship and enemy ships.
      */
     private void manageShipEnemyCollisions() {
+        // Player 1 collision checks
         if (!this.ship.isDestroyed() && !this.ship.isInvincible()) {
             for (EnemyShip enemyShip : this.enemyShipFormation) {
                 if (checkCollision(this.ship, enemyShip)) {
                     this.enemyShipFormation.destroy(enemyShip);
                     this.ship.destroy();
                     this.lives--;
-                    showHealthPopup("-1 Life (Collision!)");
-                    this.logger.info("Ship collided with enemy! " + this.lives
-                            + " lives remaining.");
+                    showHealthPopup("-1 Life (P1 Collision!)");
+                    this.logger.info("Ship 1 collided with enemy! " + this.lives + " lives remaining.");
                     return;
                 }
             }
-
             for (EnemyShip enemyShipSpecial : this.enemyShipSpecialFormation) {
-                if (enemyShipSpecial != null && !enemyShipSpecial.isDestroyed()
-                        && checkCollision(this.ship, enemyShipSpecial)) {
+                if (enemyShipSpecial != null && !enemyShipSpecial.isDestroyed() && checkCollision(this.ship, enemyShipSpecial)) {
                     this.enemyShipSpecialFormation.destroy(enemyShipSpecial);
                     this.ship.destroy();
                     this.lives--;
-                    showHealthPopup("-1 Life (Collision!)");
-                    this.logger.info("Ship collided with special enemy formation! "
-                            + this.lives + " lives remaining.");
+                    showHealthPopup("-1 Life (P1 Collision!)");
+                    this.logger.info("Ship 1 collided with special enemy! " + this.lives + " lives remaining.");
                     return;
                 }
             }
-
-            if (this.omegaBoss != null && !this.omegaBoss.isDestroyed()
-                    && checkCollision(this.ship, this.omegaBoss)) {
+            if (this.omegaBoss != null && !this.omegaBoss.isDestroyed() && checkCollision(this.ship, this.omegaBoss)) {
                 this.ship.destroy();
                 this.lives--;
-                showHealthPopup("-1 Life (Boss Collision!)");
-                this.logger.info("Ship collided with omega boss! " + this.lives
-                        + " lives remaining.");
+                showHealthPopup("-1 Life (P1 Boss Collision!)");
+                this.logger.info("Ship 1 collided with omega boss! " + this.lives + " lives remaining.");
                 return;
             }
-
-            if (this.finalBoss != null && !this.finalBoss.isDestroyed()
-                    && checkCollision(this.ship, this.finalBoss)) {
+            if (this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(this.ship, this.finalBoss)) {
                 this.ship.destroy();
                 this.lives--;
-                showHealthPopup("-1 Life (Boss Collision!)");
-                this.logger.info("Ship collided with final boss! " + this.lives
-                        + " lives remaining.");
+                showHealthPopup("-1 Life (P1 Boss Collision!)");
+                this.logger.info("Ship 1 collided with final boss! " + this.lives + " lives remaining.");
+                return;
+            }
+        }
+
+        // Player 2 collision checks
+        if (this.isTwoPlayer && this.ship2 != null && !this.ship2.isDestroyed() && !this.ship2.isInvincible()) {
+            for (EnemyShip enemyShip : this.enemyShipFormation) {
+                if (checkCollision(this.ship2, enemyShip)) {
+                    this.enemyShipFormation.destroy(enemyShip);
+                    this.ship2.destroy();
+                    this.livesP2--;
+                    showHealthPopup("-1 Life (P2 Collision!)");
+                    this.logger.info("Ship 2 collided with enemy! " + this.livesP2 + " lives remaining.");
+                    return;
+                }
+            }
+            for (EnemyShip enemyShipSpecial : this.enemyShipSpecialFormation) {
+                if (enemyShipSpecial != null && !enemyShipSpecial.isDestroyed() && checkCollision(this.ship2, enemyShipSpecial)) {
+                    this.enemyShipSpecialFormation.destroy(enemyShipSpecial);
+                    this.ship2.destroy();
+                    this.livesP2--;
+                    showHealthPopup("-1 Life (P2 Collision!)");
+                    this.logger.info("Ship 2 collided with special enemy! " + this.livesP2 + " lives remaining.");
+                    return;
+                }
+            }
+            if (this.omegaBoss != null && !this.omegaBoss.isDestroyed() && checkCollision(this.ship2, this.omegaBoss)) {
+                this.ship2.destroy();
+                this.livesP2--;
+                showHealthPopup("-1 Life (P2 Boss Collision!)");
+                this.logger.info("Ship 2 collided with omega boss! " + this.livesP2 + " lives remaining.");
+                return;
+            }
+            if (this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(this.ship2, this.finalBoss)) {
+                this.ship2.destroy();
+                this.livesP2--;
+                showHealthPopup("-1 Life (P2 Boss Collision!)");
+                this.logger.info("Ship 2 collided with final boss! " + this.livesP2 + " lives remaining.");
                 return;
             }
         }
@@ -593,40 +723,25 @@ public class GameScreen extends Screen {
 		if (!this.ship.isDestroyed()) {
 			for (DropItem dropItem : this.dropItems) {
 				if (checkCollision(this.ship, dropItem)) {
-					this.logger.info("Player acquired dropItem: " + dropItem.getItemType());
+					this.logger.info("Player 1 acquired dropItem: " + dropItem.getItemType());
 					ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
-
-					switch (dropItem.getItemType()) {
-						case Heal:
-							gainLife();
-							break;
-						case Shield:
-							ship.activateInvincibility(5000);
-							break;
-						case Stop:
-							DropItem.applyTimeFreezeItem(3000);
-							break;
-						case Push:
-							DropItem.PushbackItem(this.enemyShipFormation,20);
-							break;
-						case Explode:
-							int destroyedEnemy = this.enemyShipFormation.destroyAll();
-                            int pts = destroyedEnemy * 5;
-                            this.score += pts;
-                            break;
-						case Slow:
-							enemyShipFormation.activateSlowdown();
-							this.logger.info("Enemy formation slowed down!");
-							break;
-						default:
-							break;
-					}
+					applyItemEffect(dropItem, this.ship);
 					acquiredDropItems.add(dropItem);
 				}
 			}
-			this.dropItems.removeAll(acquiredDropItems);
-			ItemPool.recycle(acquiredDropItems);
 		}
+		if (this.isTwoPlayer && this.ship2 != null && !this.ship2.isDestroyed()) {
+			for (DropItem dropItem : this.dropItems) {
+				if (checkCollision(this.ship2, dropItem) && !acquiredDropItems.contains(dropItem)) {
+					this.logger.info("Player 2 acquired dropItem: " + dropItem.getItemType());
+					ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
+					applyItemEffect(dropItem, this.ship2);
+					acquiredDropItems.add(dropItem);
+				}
+			}
+		}
+		this.dropItems.removeAll(acquiredDropItems);
+		ItemPool.recycle(acquiredDropItems);
 	}
 
 
@@ -677,18 +792,62 @@ public class GameScreen extends Screen {
      * @return Current game state.
 	 */
 	    public final GameState getGameState() {
-	        if (this.coin > 2000) {
-	            AchievementManager.getInstance().unlockAchievement("Mr. Greedy");
-	        }
-	        return new GameState(this.level, this.score, this.lives,
-	                this.bulletsShot, this.shipsDestroyed,this.coin);
-	    }
+		if (this.coin > 2000) {
+			AchievementManager.getInstance().unlockAchievement("Mr. Greedy");
+		}
+		GameState newGameState = new GameState(this.level, this.score, this.lives,
+				this.bulletsShot, this.shipsDestroyed,this.coin);
+		if (this.isTwoPlayer) {
+			newGameState.setTwoPlayerMode(this.livesP2);
+			newGameState.setScoreP2(this.scoreP2);
+		}
+		return newGameState;
+	}
 	/**
 	 * Adds one life to the player.
 	 */
 	public final void gainLife() {
 		if (this.lives < this.maxLives) {
 			this.lives++;
+			showHealthPopup("+1 Life (P1)");
+		}
+	}
+
+	/**
+	 * Adds one life to player 2.
+	 */
+	public final void gainLifeP2() {
+		if (this.livesP2 < this.maxLives) {
+			this.livesP2++;
+			showHealthPopup("+1 Life (P2)");
+		}
+	}
+
+	private void applyItemEffect(DropItem item, Ship targetShip) {
+		switch (item.getItemType()) {
+			case Heal:
+				if (targetShip.getPlayerId() == 1) gainLife(); else gainLifeP2();
+				break;
+			case Shield:
+				targetShip.activateInvincibility(5000);
+				break;
+			case Stop:
+				DropItem.applyTimeFreezeItem(3000);
+				break;
+			case Push:
+				DropItem.PushbackItem(this.enemyShipFormation,20);
+				break;
+			case Explode:
+				int destroyedEnemy = this.enemyShipFormation.destroyAll();
+				int pts = destroyedEnemy * 5;
+				if (targetShip.getPlayerId() == 1) this.score += pts; else this.scoreP2 += pts;
+				break;
+			case Slow:
+				enemyShipFormation.activateSlowdown();
+				this.logger.info("Enemy formation slowed down!");
+				break;
+			default:
+				break;
 		}
 	}
 

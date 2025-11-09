@@ -179,22 +179,28 @@ public final class DrawManager {
 	}
 
 	/**
-	 * Draws current score on screen.
+	 * Draws current score on screen for player 1.
 	 */
 	public void drawScore(final Screen screen, final int score) {
+		drawScore(screen, score, 1);
+	}
+
+	/**
+	 * Draws current score on screen for a specific player.
+	 * @param screen The screen to draw on.
+	 * @param score The score to draw.
+	 * @param player The player number (1 or 2).
+	 */
+	public void drawScore(final Screen screen, final int score, final int player) {
 		backBufferGraphics.setFont(fontRegular);
 		backBufferGraphics.setColor(Color.WHITE);
-		String scoreString = String.format("P1:%04d", score);
-		backBufferGraphics.drawString(scoreString, screen.getWidth() - 120, 25);
+		String scoreString = String.format("P%d:%04d", player, score);
+		if (player == 1) {
+			backBufferGraphics.drawString(scoreString, 20, 25);
+		} else {
+			backBufferGraphics.drawString(scoreString, screen.getWidth() - 120, 25);
+		}
 	}
-    //  === [ADD] Draw P2's score on the line below P1's score ===
-    public void drawScoreP2(final Screen screen, final int scoreP2) {
-        backBufferGraphics.setFont(fontRegular);
-        backBufferGraphics.setColor(Color.WHITE);
-        String text = String.format("P2:%04d", scoreP2);
-        //  Y coordinate is 15px lower than P1 score to avoid overlapping
-        backBufferGraphics.drawString(text, screen.getWidth() - 120, 40);
-    }
 
     /**
      * Draws the elapsed time on screen.
@@ -224,27 +230,32 @@ public final class DrawManager {
     }
 
 	/**
-	 * Draws number of remaining lives on screen.
+	 * Draws number of remaining lives on screen for player 1.
 	 */
 	public void drawLives(final Screen screen, final int lives) {
-		backBufferGraphics.setFont(fontRegular);
-		backBufferGraphics.setColor(Color.WHITE);
-		// backBufferGraphics.drawString("P1:" + Integer.toString(lives), 10, 25);
-		backBufferGraphics.drawString("P1:", 15, 25);
-		Ship dummyShip = new Ship(0, 0,Color.green);
-		for (int i = 0; i < lives; i++)
-			drawEntity(dummyShip, 40 + 35 * i, 10);
+		drawLives(screen, lives, 1);
 	}
 
-	public void drawLivesP2(final Screen screen, final int lives) {
+	/**
+	 * Draws number of remaining lives on screen for a specific player.
+	 * @param screen The screen to draw on.
+	 * @param lives The lives to draw.
+	 * @param player The player number (1 or 2).
+	 */
+	public void drawLives(final Screen screen, final int lives, final int player) {
 		backBufferGraphics.setFont(fontRegular);
 		backBufferGraphics.setColor(Color.WHITE);
-		// backBufferGraphics.drawString("P2:" + Integer.toString(lives), 10, 40);
-		backBufferGraphics.drawString("P2:", 15, 40);
-
-		Ship dummyShip = new Ship(0, 0,Color.pink);
-		for (int i = 0; i < lives; i++) {
-			drawEntity(dummyShip, 40 + 35 * i, 30);
+		
+		if (player == 1) {
+			backBufferGraphics.drawString("P1", 20, 40);
+			Ship dummyShip = new Ship(0, 0, Color.GREEN);
+			for (int i = 0; i < lives; i++)
+				drawEntity(dummyShip, 50 + 15 * i, 28);
+		} else {
+			backBufferGraphics.drawString("P2", screen.getWidth() - 120, 40);
+			Ship dummyShip = new Ship(0, 0, Color.CYAN);
+			for (int i = 0; i < lives; i++)
+				drawEntity(dummyShip, screen.getWidth() - 90 + 15 * i, 28);
 		}
 	}
 
@@ -361,6 +372,35 @@ public final class DrawManager {
         if (option == 0) backBufferGraphics.setColor(pulseColor);
         else backBufferGraphics.setColor(Color.WHITE);
         drawCenteredRegularString(screen, exitString, screen.getHeight() / 3 * 2 + fontRegularMetrics.getHeight() * 4);
+	}
+
+	/**
+	 * Draws the 1P/2P selection menu.
+	 *
+	 * @param screen
+	 *            Screen to draw on.
+	 * @param option
+	 *            Selection in the 1P/2P menu (1 for 1P, 2 for 2P).
+	 */
+	public void drawPlayMenu(final Screen screen, final int option) {
+		String p1String = "1P Game";
+		String p2String = "2P Game";
+		String backString = "Press ESC to go back";
+
+		// Pulsing color for selected item
+		float pulse = (float) ((Math.sin(System.currentTimeMillis() / 200.0) + 1.0) / 2.0);
+		Color pulseColor = new Color(0, 0.5f + pulse * 0.5f, 0);
+
+		if (option == 1) backBufferGraphics.setColor(pulseColor);
+		else backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, p1String, screen.getHeight() / 3 * 2);
+
+		if (option == 2) backBufferGraphics.setColor(pulseColor);
+		else backBufferGraphics.setColor(Color.WHITE);
+		drawCenteredRegularString(screen, p2String, screen.getHeight() / 3 * 2 + fontRegularMetrics.getHeight() * 2);
+
+		backBufferGraphics.setColor(Color.GRAY);
+		drawCenteredRegularString(screen, backString, screen.getHeight() - 50);
 	}
 
 	/**

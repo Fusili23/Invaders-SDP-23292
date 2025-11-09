@@ -120,6 +120,11 @@ public class TitleScreen extends Screen {
 	/** Random number generator. */
     private Random random;
 
+	/** State for 1P/2P selection menu. */
+	private boolean isInPlayMenu = false;
+	/** Selection in the 1P/2P menu. 1 for 1P, 2 for 2P. */
+	private int playMenuSelection = 1;
+
 	/**
 	 * Constructor, establishes the properties of the screen.
 	 * 
@@ -249,47 +254,75 @@ public class TitleScreen extends Screen {
 		draw();
 		if (this.selectionCooldown.checkFinished()
 				&& this.inputDelay.checkFinished()) {
-			if (inputManager.isKeyDown(KeyEvent.VK_UP)
-					|| inputManager.isKeyDown(KeyEvent.VK_W)) {
-				previousMenuItem();
-				this.selectionCooldown.reset();
-			}
-			if (inputManager.isKeyDown(KeyEvent.VK_DOWN)
-					|| inputManager.isKeyDown(KeyEvent.VK_S)) {
-				nextMenuItem();
-				this.selectionCooldown.reset();
-			}
-			if (inputManager.isKeyDown(KeyEvent.VK_SPACE)){
-				if (this.returnCode != 5) {
-					this.isRunning = false;
-				} else {
-					this.soundButton.changeSoundState();
-
-					if (SoundButton.getIsSoundOn()) {
-						SoundManager.uncutAllSound();
+			if (isInPlayMenu) {
+				// Handle 1P/2P menu input
+				if (inputManager.isKeyDown(KeyEvent.VK_UP) || inputManager.isKeyDown(KeyEvent.VK_W)) {
+					this.playMenuSelection = 1;
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_DOWN) || inputManager.isKeyDown(KeyEvent.VK_S)) {
+					this.playMenuSelection = 2;
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+					if (this.playMenuSelection == 1) {
+						this.returnCode = 2; // 1P Game
 					} else {
-						SoundManager.cutAllSound();
+						this.returnCode = 7; // 2P Game (new return code)
 					}
-
-					if (this.soundButton.isTeamCreditScreenPossible()) {
-						this.returnCode = 8;
+					this.isRunning = false;
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
+					this.isInPlayMenu = false;
+					this.selectionCooldown.reset();
+				}
+			} else {
+				// Handle main menu input
+				if (inputManager.isKeyDown(KeyEvent.VK_UP)
+						|| inputManager.isKeyDown(KeyEvent.VK_W)) {
+					previousMenuItem();
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_DOWN)
+						|| inputManager.isKeyDown(KeyEvent.VK_S)) {
+					nextMenuItem();
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+					if (this.returnCode == 2) { // Play selected
+						this.isInPlayMenu = true;
+						this.selectionCooldown.reset();
+					} else if (this.returnCode != 5) {
 						this.isRunning = false;
 					} else {
-						this.selectionCooldown.reset();
+						this.soundButton.changeSoundState();
+
+						if (SoundButton.getIsSoundOn()) {
+							SoundManager.uncutAllSound();
+						} else {
+							SoundManager.cutAllSound();
+						}
+
+						if (this.soundButton.isTeamCreditScreenPossible()) {
+							this.returnCode = 8;
+							this.isRunning = false;
+						} else {
+							this.selectionCooldown.reset();
+						}
 					}
 				}
-			}
-			if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)
-					|| inputManager.isKeyDown(KeyEvent.VK_D)) {
-				this.returnCode = 5;
-				this.targetAngle += 90;
-				this.selectionCooldown.reset();
-			}
-			if (this.returnCode == 5 && inputManager.isKeyDown(KeyEvent.VK_LEFT)
-					|| inputManager.isKeyDown(KeyEvent.VK_A)) {
-				this.returnCode = 4;
-				this.targetAngle -= 90;
-				this.selectionCooldown.reset();
+				if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)
+						|| inputManager.isKeyDown(KeyEvent.VK_D)) {
+					this.returnCode = 5;
+					this.targetAngle += 90;
+					this.selectionCooldown.reset();
+				}
+				if (this.returnCode == 5 && inputManager.isKeyDown(KeyEvent.VK_LEFT)
+						|| inputManager.isKeyDown(KeyEvent.VK_A)) {
+					this.returnCode = 4;
+					this.targetAngle -= 90;
+					this.selectionCooldown.reset();
+				}
 			}
 		}
 	}
@@ -368,8 +401,13 @@ public class TitleScreen extends Screen {
 			drawManager.drawEntity(enemy, screenX, screenY);
 		}
 
-		drawManager.drawTitle(this);
-		drawManager.drawMenu(this, this.returnCode);
+		if (isInPlayMenu) {
+			drawManager.drawPlayMenu(this, this.playMenuSelection);
+		} else {
+			drawManager.drawTitle(this);
+			drawManager.drawMenu(this, this.returnCode);
+		}
+		
 		drawManager.drawEntity(this.soundButton, this.width * 4 / 5 - 16,
 				this.height * 4 / 5 - 16);
 
