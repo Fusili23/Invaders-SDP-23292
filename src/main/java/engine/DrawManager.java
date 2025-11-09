@@ -13,13 +13,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import entity.Entity;
-import entity.FinalBoss;
 import entity.Ship;
-import engine.Achievement;
+import screen.ShopScreen;
 import screen.CreditScreen;
 import screen.Screen;
-import engine.Score;
-import screen.TitleScreen;
 import screen.TitleScreen.Star;
 import screen.TitleScreen.ShootingStar;
 
@@ -529,7 +526,7 @@ public final class DrawManager {
 	/**
 	 * Draws the complete shop screen with all items and levels.
 	 */
-	public void drawShopScreen(final Screen screen, final int coinBalance, final int selectedItem, final int selectionMode, final int selectedLevel, final int totalItems, final String[] itemNames, final String[] itemDescriptions, final int[][] itemPrices, final int[] maxLevels, final screen.ShopScreen shopScreen) {
+	public void drawShopScreen(final Screen screen, final int coinBalance, final int selectedItem, final int selectionMode, final int selectedLevel, final int totalItems, final String[] itemNames, final String[] itemDescriptions, final int[][] itemPrices, final int[] maxLevels, final ShopScreen shopScreen) {
 		// Draw title
 		backBufferGraphics.setColor(Color.GREEN);
 		drawCenteredBigString(screen, "SHOP", screen.getHeight() / 8);

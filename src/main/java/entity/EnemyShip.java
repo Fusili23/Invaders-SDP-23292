@@ -1,12 +1,10 @@
 package entity;
+
 import audio.SoundManager;
-
-
-import java.awt.Color;
-
 import engine.Cooldown;
 import engine.Core;
 import engine.DrawManager.SpriteType;
+import java.awt.Color;
 
 /**
  * Implements a enemy ship, to be destroyed by the player.

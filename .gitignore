@@ -179,3 +179,8 @@ log*
 .checkstyle
 production
 achievements.dat
+
+# Gradle Wrapper 포함시키기
+!gradlew
+!gradlew.bat
+!gradle/wrapper/**
