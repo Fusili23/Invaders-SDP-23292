@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    // ✅ JUnit 5 기본 API + Engine + Launcher
+    // ✅ JUnit 5 기본 구성
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
@@ -19,7 +19,7 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main']
+            srcDirs = ['src/main/java']
         }
         resources {
             srcDirs = ['res']
@@ -27,10 +27,11 @@ sourceSets {
     }
     test {
         java {
-            srcDirs = ['src/test']
+            srcDirs = ['src/test/java']
         }
     }
 }
+
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -43,6 +44,6 @@ test {
         events "passed", "skipped", "failed"
     }
     doLast {
-        println "\n[TEST COMPLETE] EnemyShipTest finished."
+        println "\n[TEST COMPLETE] All EnemyShipTest logs printed successfully."
     }
 }
