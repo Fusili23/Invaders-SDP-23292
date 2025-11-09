@@ -1,0 +1,43 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️. 소스 코드 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️. JDK 17 설치 (필요시 11로 변경 가능)
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3️. Gradle 실행 권한 부여
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x gradlew
+
+      # 4️. Gradle 빌드
+      - name: Build with Gradle
+        run: ./gradlew clean build --stacktrace
+
+      # 5️. JUnit 테스트 실행
+      - name: Run tests
+        run: ./gradlew test --info
+
+      # 6. 테스트 리포트 업로드
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-test-report
+          path: build/reports/tests/test
