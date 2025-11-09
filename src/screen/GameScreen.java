@@ -239,7 +239,7 @@ public class GameScreen extends Screen {
 			}
 
 			// Player 1 controls
-			if (!this.ship.isDestroyed()) {
+			if (!this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed()) {
 				boolean right = inputManager.isKeyDown(KeyEvent.VK_D);
 				boolean left  = inputManager.isKeyDown(KeyEvent.VK_A);
 				boolean up    = inputManager.isKeyDown(KeyEvent.VK_W);
@@ -265,7 +265,7 @@ public class GameScreen extends Screen {
 			}
 
 			// Player 2 controls
-			if (this.isTwoPlayer && !this.ship2.isDestroyed()) {
+			if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && !this.ship2.isDestroyed()) {
 				boolean right = inputManager.isKeyDown(KeyEvent.VK_RIGHT);
 				boolean left  = inputManager.isKeyDown(KeyEvent.VK_LEFT);
 				boolean up    = inputManager.isKeyDown(KeyEvent.VK_UP);
@@ -348,7 +348,7 @@ public class GameScreen extends Screen {
 		cleanBullets();
 		draw();
 
-		boolean allPlayersDead = this.lives == 0 && (!this.isTwoPlayer || this.livesP2 == 0);
+		boolean allPlayersDead = this.ship.isPermanentlyDestroyed() && (!this.isTwoPlayer || this.ship2.isPermanentlyDestroyed());
 		if (allPlayersDead && !this.levelFinished) {
 			this.levelFinished = true;
 			this.screenFinishedCooldown.reset();
@@ -382,9 +382,11 @@ public class GameScreen extends Screen {
 	private void draw() {
 		drawManager.initDrawing(this);
 
-		drawManager.drawEntity(this.ship, this.ship.getPositionX(),
-				this.ship.getPositionY());
-		if (this.isTwoPlayer) {
+		if (!this.ship.isPermanentlyDestroyed()) {
+			drawManager.drawEntity(this.ship, this.ship.getPositionX(),
+					this.ship.getPositionY());
+		}
+		if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed()) {
 			drawManager.drawEntity(this.ship2, this.ship2.getPositionX(),
 					this.ship2.getPositionY());
 		}
@@ -498,24 +500,30 @@ public class GameScreen extends Screen {
 		Set<Bullet> recyclable = new HashSet<Bullet>();
 		for (Bullet bullet : this.bullets)
 			if (bullet.getSpeed() > 0) { // Enemy bullet
-				if (checkCollision(bullet, this.ship) && !this.levelFinished) {
+				if (!this.ship.isPermanentlyDestroyed() && checkCollision(bullet, this.ship) && !this.levelFinished) {
 					recyclable.add(bullet);
 					if (!this.ship.isInvincible()) {
 						if (!this.ship.isDestroyed()) {
 							this.ship.destroy();
 							this.lives--;
+							if (this.lives == 0) {
+								this.ship.permanentlyDestroy();
+							}
 							showHealthPopup("-1 Health (P1)");
 							this.logger.info("Hit on player 1 ship, " + this.lives
 									+ " lives remaining.");
 						}
 					}
 				}
-				if (this.isTwoPlayer && this.ship2 != null && checkCollision(bullet, this.ship2) && !this.levelFinished) {
+				if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && checkCollision(bullet, this.ship2) && !this.levelFinished) {
 					recyclable.add(bullet);
 					if (!this.ship2.isInvincible()) {
 						if (!this.ship2.isDestroyed()) {
 							this.ship2.destroy();
 							this.livesP2--;
+							if (this.livesP2 == 0) {
+								this.ship2.permanentlyDestroy();
+							}
 							showHealthPopup("-1 Health (P2)");
 							this.logger.info("Hit on player 2 ship, " + this.livesP2
 									+ " lives remaining.");
@@ -639,12 +647,15 @@ public class GameScreen extends Screen {
      */
     private void manageShipEnemyCollisions() {
         // Player 1 collision checks
-        if (!this.ship.isDestroyed() && !this.ship.isInvincible()) {
+        if (!this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed() && !this.ship.isInvincible()) {
             for (EnemyShip enemyShip : this.enemyShipFormation) {
                 if (checkCollision(this.ship, enemyShip)) {
                     this.enemyShipFormation.destroy(enemyShip);
                     this.ship.destroy();
                     this.lives--;
+					if (this.lives == 0) {
+						this.ship.permanentlyDestroy();
+					}
                     showHealthPopup("-1 Life (P1 Collision!)");
                     this.logger.info("Ship 1 collided with enemy! " + this.lives + " lives remaining.");
                     return;
@@ -655,6 +666,9 @@ public class GameScreen extends Screen {
                     this.enemyShipSpecialFormation.destroy(enemyShipSpecial);
                     this.ship.destroy();
                     this.lives--;
+					if (this.lives == 0) {
+						this.ship.permanentlyDestroy();
+					}
                     showHealthPopup("-1 Life (P1 Collision!)");
                     this.logger.info("Ship 1 collided with special enemy! " + this.lives + " lives remaining.");
                     return;
@@ -663,6 +677,9 @@ public class GameScreen extends Screen {
             if (this.omegaBoss != null && !this.omegaBoss.isDestroyed() && checkCollision(this.ship, this.omegaBoss)) {
                 this.ship.destroy();
                 this.lives--;
+				if (this.lives == 0) {
+					this.ship.permanentlyDestroy();
+				}
                 showHealthPopup("-1 Life (P1 Boss Collision!)");
                 this.logger.info("Ship 1 collided with omega boss! " + this.lives + " lives remaining.");
                 return;
@@ -670,6 +687,9 @@ public class GameScreen extends Screen {
             if (this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(this.ship, this.finalBoss)) {
                 this.ship.destroy();
                 this.lives--;
+				if (this.lives == 0) {
+					this.ship.permanentlyDestroy();
+				}
                 showHealthPopup("-1 Life (P1 Boss Collision!)");
                 this.logger.info("Ship 1 collided with final boss! " + this.lives + " lives remaining.");
                 return;
@@ -677,12 +697,15 @@ public class GameScreen extends Screen {
         }
 
         // Player 2 collision checks
-        if (this.isTwoPlayer && this.ship2 != null && !this.ship2.isDestroyed() && !this.ship2.isInvincible()) {
+        if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && !this.ship2.isDestroyed() && !this.ship2.isInvincible()) {
             for (EnemyShip enemyShip : this.enemyShipFormation) {
                 if (checkCollision(this.ship2, enemyShip)) {
                     this.enemyShipFormation.destroy(enemyShip);
                     this.ship2.destroy();
                     this.livesP2--;
+					if (this.livesP2 == 0) {
+						this.ship2.permanentlyDestroy();
+					}
                     showHealthPopup("-1 Life (P2 Collision!)");
                     this.logger.info("Ship 2 collided with enemy! " + this.livesP2 + " lives remaining.");
                     return;
@@ -693,6 +716,9 @@ public class GameScreen extends Screen {
                     this.enemyShipSpecialFormation.destroy(enemyShipSpecial);
                     this.ship2.destroy();
                     this.livesP2--;
+					if (this.livesP2 == 0) {
+						this.ship2.permanentlyDestroy();
+					}
                     showHealthPopup("-1 Life (P2 Collision!)");
                     this.logger.info("Ship 2 collided with special enemy! " + this.livesP2 + " lives remaining.");
                     return;
@@ -701,6 +727,9 @@ public class GameScreen extends Screen {
             if (this.omegaBoss != null && !this.omegaBoss.isDestroyed() && checkCollision(this.ship2, this.omegaBoss)) {
                 this.ship2.destroy();
                 this.livesP2--;
+				if (this.livesP2 == 0) {
+					this.ship2.permanentlyDestroy();
+				}
                 showHealthPopup("-1 Life (P2 Boss Collision!)");
                 this.logger.info("Ship 2 collided with omega boss! " + this.livesP2 + " lives remaining.");
                 return;
@@ -708,6 +737,9 @@ public class GameScreen extends Screen {
             if (this.finalBoss != null && !this.finalBoss.isDestroyed() && checkCollision(this.ship2, this.finalBoss)) {
                 this.ship2.destroy();
                 this.livesP2--;
+				if (this.livesP2 == 0) {
+					this.ship2.permanentlyDestroy();
+				}
                 showHealthPopup("-1 Life (P2 Boss Collision!)");
                 this.logger.info("Ship 2 collided with final boss! " + this.livesP2 + " lives remaining.");
                 return;
@@ -720,7 +752,7 @@ public class GameScreen extends Screen {
      */
     private void manageItemCollisions() {
         Set<DropItem> acquiredDropItems = new HashSet<DropItem>();
-		if (!this.ship.isDestroyed()) {
+		if (!this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed()) {
 			for (DropItem dropItem : this.dropItems) {
 				if (checkCollision(this.ship, dropItem)) {
 					this.logger.info("Player 1 acquired dropItem: " + dropItem.getItemType());
@@ -730,7 +762,7 @@ public class GameScreen extends Screen {
 				}
 			}
 		}
-		if (this.isTwoPlayer && this.ship2 != null && !this.ship2.isDestroyed()) {
+		if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && !this.ship2.isDestroyed()) {
 			for (DropItem dropItem : this.dropItems) {
 				if (checkCollision(this.ship2, dropItem) && !acquiredDropItems.contains(dropItem)) {
 					this.logger.info("Player 2 acquired dropItem: " + dropItem.getItemType());
@@ -907,11 +939,26 @@ public class GameScreen extends Screen {
 					bulletsToRemove.add(b);
 				}
 				/** If the bullet collides with ship */
-				else if (this.lives > 0 && this.checkCollision(b, this.ship)) {
+				else if (!this.ship.isPermanentlyDestroyed() && this.checkCollision(b, this.ship)) {
 					if (!this.ship.isDestroyed()) {
 						this.ship.destroy();
 						this.lives--;
+						if (this.lives == 0) {
+							this.ship.permanentlyDestroy();
+						}
 						this.logger.info("Hit on player ship, " + this.lives + " lives remaining.");
+					}
+					bulletsToRemove.add(b);
+				}
+				/** If the bullet collides with ship2 */
+				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.checkCollision(b, this.ship2)) {
+					if (!this.ship2.isDestroyed()) {
+						this.ship2.destroy();
+						this.livesP2--;
+						if (this.livesP2 == 0) {
+							this.ship2.permanentlyDestroy();
+						}
+						this.logger.info("Hit on player 2 ship, " + this.livesP2 + " lives remaining.");
 					}
 					bulletsToRemove.add(b);
 				}

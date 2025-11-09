@@ -131,4 +131,17 @@ public class Entity {
 	public final int getHeight() {
 		return this.height;
 	}
+
+	/**
+	 * Sets the position of the entity.
+	 *
+	 * @param positionX
+	 *            New position of the entity in the X axis.
+	 * @param positionY
+	 *            New position of the entity in the Y axis.
+	 */
+	public final void setPosition(final int positionX, final int positionY) {
+		this.positionX = positionX;
+		this.positionY = positionY;
+	}
 }
