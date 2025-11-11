@@ -33,6 +33,8 @@ public class Ship extends Entity {
 	private boolean isInvincible;
 	/** Checks if the ship is permanently destroyed. */
 	private boolean isPermanentlyDestroyed;
+	/** Original color of the ship. */
+	private Color originalColor;
     // === [ADD] Which player: 1 = P1, 2 = P2 (default 1 for single-player compatibility) ===
     private int playerId = 1;
     public void setPlayerId(int pid) { this.playerId = pid; }
@@ -48,7 +50,7 @@ public class Ship extends Entity {
 	 */
 	public Ship(final int positionX, final int positionY,final Color color) {
 		super(positionX, positionY, 13 * 2, 8 * 2, color);
-
+		this.originalColor = color;
 		this.spriteType = SpriteType.Ship;
 		this.shootingCooldown = Core.getCooldown(ShopItem.getShootingInterval());
 		this.destructionCooldown = Core.getCooldown(1000);
@@ -150,7 +152,7 @@ public class Ship extends Entity {
 		}
         if (this.isInvincible && this.shieldCooldown.checkFinished()) {
             this.isInvincible = false;
-            this.setColor(Color.GREEN);
+            this.setColor(this.originalColor);
         }
 
         if (!this.destructionCooldown.checkFinished())
