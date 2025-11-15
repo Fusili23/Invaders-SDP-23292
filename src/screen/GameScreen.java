@@ -752,29 +752,52 @@ public class GameScreen extends Screen {
      */
     private void manageItemCollisions() {
         Set<DropItem> acquiredDropItems = new HashSet<DropItem>();
-		if (!this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed()) {
-			for (DropItem dropItem : this.dropItems) {
-				if (checkCollision(this.ship, dropItem)) {
-					this.logger.info("Player 1 acquired dropItem: " + dropItem.getItemType());
-					ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
-					applyItemEffect(dropItem, this.ship);
-					acquiredDropItems.add(dropItem);
-				}
-			}
-		}
-		if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && !this.ship2.isDestroyed()) {
-			for (DropItem dropItem : this.dropItems) {
-				if (checkCollision(this.ship2, dropItem) && !acquiredDropItems.contains(dropItem)) {
-					this.logger.info("Player 2 acquired dropItem: " + dropItem.getItemType());
-					ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
-					applyItemEffect(dropItem, this.ship2);
-					acquiredDropItems.add(dropItem);
-				}
-			}
-		}
-		this.dropItems.removeAll(acquiredDropItems);
-		ItemPool.recycle(acquiredDropItems);
-	}
+        for (DropItem dropItem : this.dropItems) {
+            boolean p1Collision = !this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed() && checkCollision(this.ship, dropItem);
+            boolean p2Collision = this.isTwoPlayer && this.ship2 != null && !this.ship2.isPermanentlyDestroyed() && !this.ship2.isDestroyed() && checkCollision(this.ship2, dropItem);
+
+            if (p1Collision && p2Collision) {
+                int p1Distance = distance(this.ship, dropItem);
+                int p2Distance = distance(this.ship2, dropItem);
+
+                if (p1Distance <= p2Distance) { // P1 is closer or equidistant
+                    this.logger.info("Player 1 acquired dropItem: " + dropItem.getItemType());
+                    ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
+                    applyItemEffect(dropItem, this.ship);
+                    acquiredDropItems.add(dropItem);
+                } else { // P2 is closer
+                    this.logger.info("Player 2 acquired dropItem: " + dropItem.getItemType());
+                    ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
+                    applyItemEffect(dropItem, this.ship2);
+                    acquiredDropItems.add(dropItem);
+                }
+            } else if (p1Collision) {
+                this.logger.info("Player 1 acquired dropItem: " + dropItem.getItemType());
+                ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
+                applyItemEffect(dropItem, this.ship);
+                acquiredDropItems.add(dropItem);
+            } else if (p2Collision) {
+                this.logger.info("Player 2 acquired dropItem: " + dropItem.getItemType());
+                ItemHUDManager.getInstance().addDroppedItem(dropItem.getItemType());
+                applyItemEffect(dropItem, this.ship2);
+                acquiredDropItems.add(dropItem);
+            }
+        }
+        this.dropItems.removeAll(acquiredDropItems);
+        ItemPool.recycle(acquiredDropItems);
+    }
+
+    private int distance(final Entity a, final Entity b) {
+        int centerAX = a.getPositionX() + a.getWidth() / 2;
+        int centerAY = a.getPositionY() + a.getHeight() / 2;
+        int centerBX = b.getPositionX() + b.getWidth() / 2;
+        int centerBY = b.getPositionY() + b.getHeight() / 2;
+        
+        double distanceX = centerAX - centerBX;
+        double distanceY = centerAY - centerBY;
+        
+        return (int) Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    }
 
 
 	/**
@@ -951,7 +974,7 @@ public class GameScreen extends Screen {
 					bulletsToRemove.add(b);
 				}
 				/** If the bullet collides with ship2 */
-				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.checkCollision(b, this.ship2)) {
+				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && this.checkCollision(b, this.ship2)) {
 					if (!this.ship2.isDestroyed()) {
 						this.ship2.destroy();
 						this.livesP2--;
