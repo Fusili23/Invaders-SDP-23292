@@ -381,10 +381,8 @@ public final class DrawManager {
 	 *            Screen to draw on.
 	 * @param option
 	 *            Selection in the 1P/2P menu (1 for 1P, 2 for 2P).
-	 * @param soundSelected
-	 *            True if the sound button is selected.
 	 */
-	public void drawPlayMenu(final Screen screen, final int option, final boolean soundSelected) {
+	public void drawPlayMenu(final Screen screen, final int option) {
 		String p1String = "1P Game";
 		String p2String = "2P Game";
 		String backString = "Press ESC to go back";
@@ -393,11 +391,11 @@ public final class DrawManager {
 		float pulse = (float) ((Math.sin(System.currentTimeMillis() / 200.0) + 1.0) / 2.0);
 		Color pulseColor = new Color(0, 0.5f + pulse * 0.5f, 0);
 
-		if (!soundSelected && option == 1) backBufferGraphics.setColor(pulseColor);
+		if (option == 1) backBufferGraphics.setColor(pulseColor);
 		else backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, p1String, screen.getHeight() / 3 * 2);
 
-		if (!soundSelected && option == 2) backBufferGraphics.setColor(pulseColor);
+		if (option == 2) backBufferGraphics.setColor(pulseColor);
 		else backBufferGraphics.setColor(Color.WHITE);
 		drawCenteredRegularString(screen, p2String, screen.getHeight() / 3 * 2 + fontRegularMetrics.getHeight() * 2);
 

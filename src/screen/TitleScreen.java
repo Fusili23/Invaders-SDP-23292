@@ -123,8 +123,8 @@ public class TitleScreen extends Screen {
 	/** State for 1P/2P selection menu. */
 	private boolean isInPlayMenu = false;
 	/** Selection in the 1P/2P menu. 1 for 1P, 2 for 2P. */
+	/** Selection in the 1P/2P menu. 1=1P, 2=2P, 3=Sound Button. */
 	private int playMenuSelection = 1;
-	private boolean playMenuSoundSelected = false;
 
 	/**
 	 * Constructor, establishes the properties of the screen.
@@ -244,7 +244,7 @@ public class TitleScreen extends Screen {
         }
 
 		// Handle sound button color
-		if ((this.returnCode == 5) || (this.isInPlayMenu && this.playMenuSoundSelected)) {
+		if ((this.returnCode == 5) || (this.isInPlayMenu && this.playMenuSelection == 3)) {
             float pulse = (float) ((Math.sin(System.currentTimeMillis() / 200.0) + 1.0) / 2.0);
             Color pulseColor = new Color(0, 0.5f + pulse * 0.5f, 0);
             this.soundButton.setColor(pulseColor);
@@ -256,47 +256,51 @@ public class TitleScreen extends Screen {
 		if (this.selectionCooldown.checkFinished()
 				&& this.inputDelay.checkFinished()) {
 			if (isInPlayMenu) {
-				if (this.playMenuSoundSelected) {
-					if (inputManager.isKeyDown(KeyEvent.VK_LEFT) || inputManager.isKeyDown(KeyEvent.VK_A)) {
-						this.playMenuSoundSelected = false;
-						this.selectionCooldown.reset();
-					}
-					if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
-						this.soundButton.changeSoundState();
-						if (SoundButton.getIsSoundOn()) {
-							SoundManager.uncutAllSound();
-						} else {
-							SoundManager.cutAllSound();
-						}
-						this.selectionCooldown.reset();
-					}
-				} else {
-					// Handle 1P/2P menu input
-					if (inputManager.isKeyDown(KeyEvent.VK_UP) || inputManager.isKeyDown(KeyEvent.VK_W)) {
-						this.playMenuSelection = 1;
-						this.selectionCooldown.reset();
-					}
-					if (inputManager.isKeyDown(KeyEvent.VK_DOWN) || inputManager.isKeyDown(KeyEvent.VK_S)) {
-						this.playMenuSelection = 2;
-						this.selectionCooldown.reset();
-					}
-					if (inputManager.isKeyDown(KeyEvent.VK_RIGHT) || inputManager.isKeyDown(KeyEvent.VK_D)) {
-						this.playMenuSoundSelected = true;
-						this.selectionCooldown.reset();
-					}
-					if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
-						if (this.playMenuSelection == 1) {
+				// Handle menu navigation
+				if (inputManager.isKeyDown(KeyEvent.VK_UP) || inputManager.isKeyDown(KeyEvent.VK_W)) {
+					if (this.playMenuSelection == 2) this.playMenuSelection = 1;
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_DOWN) || inputManager.isKeyDown(KeyEvent.VK_S)) {
+					if (this.playMenuSelection == 1) this.playMenuSelection = 2;
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_RIGHT) || inputManager.isKeyDown(KeyEvent.VK_D)) {
+					if (this.playMenuSelection == 1 || this.playMenuSelection == 2) this.playMenuSelection = 3;
+					this.selectionCooldown.reset();
+				}
+				if (inputManager.isKeyDown(KeyEvent.VK_LEFT) || inputManager.isKeyDown(KeyEvent.VK_A)) {
+					if (this.playMenuSelection == 3) this.playMenuSelection = 1; // Default back to 1P
+					this.selectionCooldown.reset();
+				}
+
+				// Handle confirmation
+				if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+					switch (this.playMenuSelection) {
+						case 1:
 							this.returnCode = 2; // 1P Game
-						} else {
-							this.returnCode = 7; // 2P Game (new return code)
-						}
-						this.isRunning = false;
+							this.isRunning = false;
+							break;
+						case 2:
+							this.returnCode = 7; // 2P Game
+							this.isRunning = false;
+							break;
+						case 3: // Toggle Music
+							this.soundButton.changeSoundState();
+							if (SoundButton.getIsSoundOn()) {
+								SoundManager.uncutAllSound();
+							} else {
+								SoundManager.cutAllSound();
+							}
+							this.selectionCooldown.reset();
+							break;
 					}
 				}
 
+				// Handle exit
 				if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
 					this.isInPlayMenu = false;
-					this.playMenuSoundSelected = false; // Reset sound selection on exit
+					this.playMenuSelection = 1; // Reset selection
 					this.selectionCooldown.reset();
 				}
 			} else {
@@ -425,7 +429,7 @@ public class TitleScreen extends Screen {
 		}
 
 		if (isInPlayMenu) {
-			drawManager.drawPlayMenu(this, this.playMenuSelection, this.playMenuSoundSelected);
+			drawManager.drawPlayMenu(this, this.playMenuSelection);
 		} else {
 			drawManager.drawTitle(this);
 			drawManager.drawMenu(this, this.returnCode);
