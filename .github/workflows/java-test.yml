@@ -24,4 +24,4 @@ jobs:
     - name: Compile code
       run: javac -cp "lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar" -d out/production/Invaders-SDP-23292 $(find src -name "*.java")
     - name: Run tests
-      run: java -cp "lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar:out/production/Invaders-SDP-23292" org.junit.runner.JUnitCore ScoreTest
+      run: java -cp "lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar:out/production/Invaders-SDP-23292" org.junit.runner.JUnitCore test.java.ScoreTest test.java.GameStateTest
