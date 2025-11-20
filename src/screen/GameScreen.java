@@ -15,6 +15,7 @@ import engine.GameTimer;
 import engine.AchievementManager;
 import engine.ItemHUDManager;
 import entity.*;
+import audio.SoundManager;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
@@ -320,6 +321,7 @@ public class GameScreen extends Screen {
 								this.omegaBoss = null;
                                 this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, this.width, this.height);
                                 this.logger.info("Final Boss has spawned!");
+								SoundManager.play("sfx/pikachu.wav");
 							} else {
 								this.levelFinished = true;
 								this.screenFinishedCooldown.reset();
@@ -936,6 +938,7 @@ public class GameScreen extends Screen {
 			case "finalBoss":
 				this.finalBoss = new FinalBoss(this.width / 2 - 50, 50, this.width, this.height);
 				this.logger.info("Final Boss has spawned!");
+				SoundManager.play("sfx/pikachu.wav");
 				break;
 			case "omegaBoss":
 			case "omegaAndFinal":

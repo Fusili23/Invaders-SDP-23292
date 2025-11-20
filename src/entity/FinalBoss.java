@@ -56,7 +56,7 @@ public class FinalBoss extends Entity implements BossEntity{
         this.shootCooldown1 = Core.getCooldown(5000);
         this.shootCooldown2 = Core.getCooldown(400);
         this.shootCooldown3 = Core.getCooldown(300);
-        this.hitSoundCooldown = Core.getCooldown(150);  // 150ms마다 한 번만 소리 나게
+        this.hitSoundCooldown = Core.getCooldown(100);  //
 
 
     }
@@ -90,7 +90,7 @@ public class FinalBoss extends Entity implements BossEntity{
         String[] hitSounds = {
                 "sfx/boss_hit1.wav",
                 "sfx/boss_hit2.wav",
-                "sfx/pikachu.wav"
+                "sfx/boss_hit3.wav"
         };
 
         if (hitSoundCooldown.checkFinished()) {
@@ -104,7 +104,10 @@ public class FinalBoss extends Entity implements BossEntity{
             lastHitSoundIndex = idx;
             String chosen = hitSounds[idx];
 
-            SoundManager.stop(chosen);
+            for (String s : hitSounds) {
+                SoundManager.stop(s);
+            }
+
             SoundManager.play(chosen);
         }
 
