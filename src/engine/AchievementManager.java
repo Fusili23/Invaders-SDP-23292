@@ -103,8 +103,10 @@ public class AchievementManager {
         if (!sniperUnlocked && shotsFired > 5) {
             double accuracy = (shotsHit / (double) shotsFired) * 100.0;
             if (accuracy <= 80.0) {
-                unlockAchievement("Bad Sniper");
-                sniperUnlocked = true;
+                if(unlockAchievement("Bad Sniper")){
+                    unlockedName = "Bad Sniper";
+                    sniperUnlocked = true;
+                }
             }
         }
         return unlockedName;
@@ -116,11 +118,14 @@ public class AchievementManager {
      *
      * @param elapsedSeconds The total number of seconds elapsed in the game.
      */
-    public void onTimeElapsedSeconds(int elapsedSeconds) {
+    public String onTimeElapsedSeconds(int elapsedSeconds) {
         if (!survivorUnlocked && elapsedSeconds >= 60) {
-            unlockAchievement("Bear Grylls");
-            survivorUnlocked = true;
+            if (unlockAchievement("Bear Grylls")) {
+                survivorUnlocked = true;
+                return "Bear Grylls";
+            }
         }
+        return null;
     }
 
     /**

@@ -144,6 +144,9 @@ public class GameScreen extends Screen {
      * @param fps
      *            Frames per second, frame rate at which the game is run.
      */
+	private String achievementPopuptext;
+
+
 	public GameScreen(final GameState gameState,
 			final Level level, final boolean bonusLife, final int maxLives,
 			final int width, final int height, final int fps) {
@@ -170,6 +173,7 @@ public class GameScreen extends Screen {
 			}
 		}
 		this.gameState = gameState;
+		this.achievementPopupCooldown = Core.getCooldown(2000);
 	}
 
 	/**
@@ -367,7 +371,9 @@ public class GameScreen extends Screen {
 
 				String achievement = this.currentLevel.getAchievementTrigger();
 				if (achievement != null && !achievement.isEmpty()) {
-					AchievementManager.getInstance().unlockAchievement(achievement);
+					if (AchievementManager.getInstance().unlockAchievement(achievement)){
+						showAchievement(achievement);
+					}	/** popup achievement at gamescrean when player clear level**/
 					this.logger.info("Unlocked achievement: " + achievement);
 				}
 			}
@@ -544,6 +550,12 @@ public class GameScreen extends Screen {
 						this.coin += (pts / 10);
 						this.shipsDestroyed++;
 
+						String unlockAchievementName = AchievementManager.getInstance().onEnemyDefeated();
+						if (unlockAchievementName != null){
+							showAchievement(unlockAchievementName);
+							this.logger.info("Achievement unlocked:" + unlockAchievementName);
+						}/** Check achievements (first kill, kill count, hit rate, etc.) that occur during normal treatment and pop up **/
+
 						String enemyType = enemyShip.getEnemyType();
 						this.enemyShipFormation.destroy(enemyShip);
 						AchievementManager.getInstance().onEnemyDefeated();
@@ -615,7 +627,9 @@ public class GameScreen extends Screen {
 						}
 						this.coin += (pts / 10);
 						this.omegaBoss.destroy();
-						AchievementManager.getInstance().unlockAchievement("Boss Slayer");
+						if (AchievementManager.getInstance().unlockAchievement("Boss Slayer")){
+							showAchievement("Boss Slayer");
+						}	/**popup achievement at gamescrean when player kill boss **/
 						this.bossExplosionCooldown.reset();
 					}
 					recyclable.add(bullet);
@@ -633,7 +647,9 @@ public class GameScreen extends Screen {
 						}
 						this.coin += (pts / 10);
 						this.finalBoss.destroy();
-                        AchievementManager.getInstance().unlockAchievement("Boss Slayer");
+						if (AchievementManager.getInstance().unlockAchievement("Boss Slayer")){
+							showAchievement("Boss Slayer");
+						}	/**popup achievement at gamescrean when player kill boss **/
 					}
 					recyclable.add(bullet);
 				}
@@ -824,7 +840,6 @@ public class GameScreen extends Screen {
      */
     public void showAchievement(String message) {
         this.achievementText = message;
-        this.achievementPopupCooldown = Core.getCooldown(2500); // Show for 2.5 seconds
         this.achievementPopupCooldown.reset();
     }
 
@@ -848,7 +863,9 @@ public class GameScreen extends Screen {
 	 */
 	    public final GameState getGameState() {
 		if (this.coin > 2000) {
-			AchievementManager.getInstance().unlockAchievement("Mr. Greedy");
+			if (AchievementManager.getInstance().unlockAchievement("Mr. Greedy")){
+				showAchievement("Mr.Greedy");
+			}/**popup achievement at gamescrean when player get over 2000 coins **/
 		}
 		GameState newGameState = new GameState(this.level, this.score, this.lives,
 				this.bulletsShot, this.shipsDestroyed,this.coin);
