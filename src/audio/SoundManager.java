@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 public class SoundManager {
     private static final Map<String, Clip> CACHE = new ConcurrentHashMap<>();
     private static volatile boolean muted = false;  // global state of sound

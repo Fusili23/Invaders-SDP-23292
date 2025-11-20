@@ -33,6 +33,10 @@ public class FinalBoss extends Entity implements BossEntity{
     private int screenHeight;
     /** random x coordinate of Shoot2's bullet  */
     private int random_x;
+    private int lastHitSoundIndex = -1;
+    private Cooldown hitSoundCooldown;
+
+
 
 
     /** basic attribute of final boss */
@@ -52,6 +56,8 @@ public class FinalBoss extends Entity implements BossEntity{
         this.shootCooldown1 = Core.getCooldown(5000);
         this.shootCooldown2 = Core.getCooldown(400);
         this.shootCooldown3 = Core.getCooldown(300);
+        this.hitSoundCooldown = Core.getCooldown(150);  // 150ms마다 한 번만 소리 나게
+
 
     }
 
@@ -81,8 +87,27 @@ public class FinalBoss extends Entity implements BossEntity{
     @Override
     public void takeDamage(int damage){
         this.healPoint -= damage;
-        SoundManager.stop("sfx/pikachu.wav");
-        SoundManager.play("sfx/pikachu.wav");
+        String[] hitSounds = {
+                "sfx/boss_hit1.wav",
+                "sfx/boss_hit2.wav",
+                "sfx/pikachu.wav"
+        };
+
+        if (hitSoundCooldown.checkFinished()) {
+            hitSoundCooldown.reset();
+
+            int idx;
+            do {
+                idx = (int) (Math.random() * hitSounds.length);
+            } while (idx == lastHitSoundIndex);
+
+            lastHitSoundIndex = idx;
+            String chosen = hitSounds[idx];
+
+            SoundManager.stop(chosen);
+            SoundManager.play(chosen);
+        }
+
         if(this.healPoint <= 0){
             this.destroy();
         }
