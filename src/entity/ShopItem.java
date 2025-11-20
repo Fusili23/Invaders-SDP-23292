@@ -44,7 +44,7 @@ public class ShopItem {
     private static final int BASE_SHOOTING_INTERVAL = 750;
 
     /** Rapid Fire Reduction Per Level (%)*/
-    private static final int[] RAPID_FIRE_REDUCTION ={0, 5, 10, 15, 20, 30};
+    private static final int[] RAPID_FIRE_REDUCTION ={0, 10, 20, 30, 40, 50};
 
 
     //===================== penetration DropItem =====================

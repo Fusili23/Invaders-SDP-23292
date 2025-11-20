@@ -64,7 +64,7 @@ public class Ship extends Entity {
 	 */
 	public final void moveRight() {
 		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionX += SPEED*(1+shipspeed/10);
+		this.positionX += (int) (SPEED * (1 + shipspeed / 10.0));
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class Ship extends Entity {
 	 */
 	public final void moveLeft() {
 		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionX -= SPEED*(1+shipspeed/10);
+		this.positionX -= (int) (SPEED * (1 + shipspeed / 10.0));
 	}
 
     /**
@@ -82,7 +82,7 @@ public class Ship extends Entity {
      */
     public final void moveUp() {
 		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionY -= SPEED*(1+shipspeed/10);
+		this.positionY -= (int) (SPEED * (1 + shipspeed / 10.0));
     }
 
     /**
@@ -91,7 +91,7 @@ public class Ship extends Entity {
      */
     public final void moveDown() {
 		int shipspeed = ShopItem.getSHIPSpeedCOUNT();
-		this.positionY += SPEED*(1+shipspeed/10);
+		this.positionY += (int) (SPEED * (1 + shipspeed / 10.0));
     }
 
 	/**
