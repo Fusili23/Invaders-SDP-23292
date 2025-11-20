@@ -18,8 +18,6 @@ public class Ship extends Entity {
 
 	/** Time between shots. */
 	private static final int SHOOTING_INTERVAL = 750;
-	/** Speed of the bullets shot by the ship. */
-	private static final int BULLET_SPEED = -6;
 	/** Movement of the ship for each unit of time. */
 	private static final int SPEED = 2;
 	
@@ -116,7 +114,7 @@ public class Ship extends Entity {
 
 			if (bulletCount == 1) {
 				// Normal shot (when Spread Shot is not purchased)
-				Bullet b = BulletPool.getBullet(centerX, centerY, BULLET_SPEED);
+				Bullet b = BulletPool.getBullet(centerX, centerY, ShopItem.getBulletSpeed());
 				SoundManager.stop("sfx/laser.wav");
                 SoundManager.play("sfx/laser.wav");
                 b.setOwnerId(this.playerId);  // === [ADD] Ownership flag: 1 = P1, 2 = P2, null for legacy logic ===
@@ -128,7 +126,7 @@ public class Ship extends Entity {
 
 				for (int i = 0; i < bulletCount; i++) {
 					int offsetX = startOffset + (i * spacing);
-                    Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, BULLET_SPEED);
+                    Bullet b = BulletPool.getBullet(centerX + offsetX, centerY, ShopItem.getBulletSpeed());
                     b.setOwnerId(this.playerId);   // Ownership flag
 
                     bullets.add(b);
