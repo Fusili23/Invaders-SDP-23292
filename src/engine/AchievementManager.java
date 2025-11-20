@@ -73,25 +73,29 @@ public class AchievementManager {
      *
      * @param name The name of the achievement to unlock.
      */
-    public void unlockAchievement(String name) {
+    public boolean unlockAchievement(String name) {
         for (Achievement achievement : achievements) {
             if (achievement.getName().equals(name) && !achievement.isUnlocked()) {
                 achievement.unlock();
-
                 saveAchievements();
-                break;
+
+                return true;
             }
         }
+        return false;
     }
 
     /**
      * Handles game events when an enemy is defeated.
      * Checks for and unlocks achievements related to enemy kills and accuracy.
      */
-    public void onEnemyDefeated() {
+    public String onEnemyDefeated() {
+        String unlockedName = null;
         if (!firstKillUnlocked) {
-            unlockAchievement("First Blood");
-            firstKillUnlocked = true;
+            if (unlockAchievement("First Blood")) {
+                unlockedName = "First Blood";
+                firstKillUnlocked = true;
+            }
         }
 
         shotsHit++;
@@ -103,6 +107,7 @@ public class AchievementManager {
                 sniperUnlocked = true;
             }
         }
+        return unlockedName;
     }
 
     /**
