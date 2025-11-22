@@ -70,6 +70,9 @@
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <fork>true</fork> <!-- Sometimes helps with classpath issues in complex projects -->
+                    <excludes>
+                        <exclude>test/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
