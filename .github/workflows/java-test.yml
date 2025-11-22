@@ -4,15 +4,15 @@
 name: Java CI/CD
 
 # --- TRIGGERS ---
-# This workflow runs on pushes and pull requests to the main branch,
+# This workflow runs on pushes and pull requests to the master branch,
 # and also allows for manual runs.
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
     tags:
       - 'v*' # Also run on tags starting with 'v' for releases
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
   workflow_dispatch:
 
 # --- JOBS ---
