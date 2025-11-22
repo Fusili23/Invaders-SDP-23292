@@ -73,7 +73,7 @@ jobs:
       # This allows for reviewing test results for each OS/Java version.
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.java }}
           path: target/surefire-reports
@@ -93,7 +93,7 @@ jobs:
       # This allows the 'release' job to download and use it.
       - name: Upload build artifact
         if: matrix.os == 'ubuntu-latest' && matrix.java == '17'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: invaders-jar
           path: target/invaders-*.jar
@@ -111,7 +111,7 @@ jobs:
       # --- 1. DOWNLOAD ARTIFACT ---
       # Downloads the JAR file that was built and uploaded by the 'build' job.
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: invaders-jar
 
