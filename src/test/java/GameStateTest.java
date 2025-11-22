@@ -1,5 +1,3 @@
-package test.java;
-
 import engine.GameState;
 import org.junit.Test;
 import static org.junit.Assert.*;
