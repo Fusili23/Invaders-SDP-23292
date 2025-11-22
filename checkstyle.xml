@@ -9,14 +9,14 @@
     <!-- Suppressions -->
     <module name="SuppressWarningsFilter"/>
 
-    <!-- Regexp -->
-    <module name="RegexpSinglelineJava">
-        <property name="format" value="\s+$"/>
-        <property name="message" value="Line has trailing spaces."/>
-    </module>
-
     <module name="TreeWalker">
         <module name="SuppressWarningsHolder"/>
+
+        <!-- Regexp -->
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="\s+$"/>
+            <property name="message" value="Line has trailing spaces."/>
+        </module>
 
         <!-- Javadoc Comments -->
         <module name="JavadocType"/>
