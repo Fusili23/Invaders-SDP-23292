@@ -15,8 +15,12 @@ import engine.Score;
  */
 public class HighScoreScreen extends Screen {
 
-	/** List of past high scores. */
-	private List<Score> highScores;
+	/** List of past 1P high scores. */
+	private List<Score> highScores1P;
+	/** List of past 2P high scores. */
+	private List<Score> highScores2P;
+	/** Check if showing 2P scores. */
+	private boolean showing2P;
 
 	/**
 	 * Constructor, establishes the properties of the screen.
@@ -32,9 +36,11 @@ public class HighScoreScreen extends Screen {
 		super(width, height, fps);
 
 		this.returnCode = 1;
+		this.showing2P = false;
 
 		try {
-			this.highScores = Core.getFileManager().loadHighScores();
+			this.highScores1P = Core.getFileManager().loadHighScores(false);
+			this.highScores2P = Core.getFileManager().loadHighScores(true);
 		} catch (NumberFormatException | IOException e) {
 			logger.warning("Couldn't load high scores!");
 		}
@@ -58,9 +64,15 @@ public class HighScoreScreen extends Screen {
 		super.update();
 
 		draw();
-		if (inputManager.isKeyDown(KeyEvent.VK_SPACE)
-				&& this.inputDelay.checkFinished())
-			this.isRunning = false;
+		if (this.inputDelay.checkFinished()) {
+			if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+				this.isRunning = false;
+			}
+			if (inputManager.isKeyDown(KeyEvent.VK_LEFT) || inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
+				this.showing2P = !this.showing2P;
+				this.inputDelay.reset();
+			}
+		}
 	}
 
 	/**
@@ -69,8 +81,12 @@ public class HighScoreScreen extends Screen {
 	private void draw() {
 		drawManager.initDrawing(this);
 
-		drawManager.drawHighScoreMenu(this);
-		drawManager.drawHighScores(this, this.highScores);
+		drawManager.drawHighScoreMenu(this, this.showing2P);
+		if (this.showing2P) {
+			drawManager.drawHighScores(this, this.highScores2P);
+		} else {
+			drawManager.drawHighScores(this, this.highScores1P);
+		}
 
 		drawManager.completeDrawing(this);
 	}

@@ -457,14 +457,23 @@ public final class DrawManager {
 
 	/**
 	 * Draws high score screen title and instructions.
+	 * 
+	 * @param screen
+	 *            Screen to draw on.
+	 * @param isTwoPlayer
+	 *            True if drawing 2-player scores, false for 1-player.
 	 */
-	public void drawHighScoreMenu(final Screen screen) {
-		String highScoreString = "High Scores";
+	public void drawHighScoreMenu(final Screen screen, final boolean isTwoPlayer) {
+		String highScoreString = "High Scores " + (isTwoPlayer ? "(2P)" : "(1P)");
 		String instructionsString = "Press Space to return";
+		String toggleString = "Press Left/Right to toggle";
+
 		backBufferGraphics.setColor(Color.GREEN);
 		drawCenteredBigString(screen, highScoreString, screen.getHeight() / 8);
+
 		backBufferGraphics.setColor(Color.GRAY);
 		drawCenteredRegularString(screen, instructionsString, screen.getHeight() / 5);
+		drawCenteredRegularString(screen, toggleString, screen.getHeight() / 5 + fontRegularMetrics.getHeight());
 	}
 
 	/**
@@ -474,11 +483,13 @@ public final class DrawManager {
         backBufferGraphics.setColor(Color.WHITE);
         int i = 0;
         String scoreString = "";
-        for (Score score : highScores) {
-            scoreString = String.format("%s        %04d", score.getName(), score.getScore());
-            drawCenteredRegularString(screen, scoreString, screen.getHeight() / 4 + fontRegularMetrics.getHeight() * (i + 1) * 2);
-            i++;
-        }
+		if (highScores != null) {
+			for (Score score : highScores) {
+				scoreString = String.format("%s        %04d", score.getName(), score.getScore());
+				drawCenteredRegularString(screen, scoreString, screen.getHeight() / 4 + fontRegularMetrics.getHeight() * (i + 1) * 2);
+				i++;
+			}
+		}
     }
 
     public void drawAchievements(final Screen screen, final List<Achievement> achievements) {
@@ -534,6 +545,14 @@ public final class DrawManager {
 	public void drawCenteredRegularString(final Screen screen, final String string, final int height) {
 		backBufferGraphics.setFont(fontRegular);
 		backBufferGraphics.drawString(string, screen.getWidth() / 2 - fontRegularMetrics.stringWidth(string) / 2, height);
+	}
+
+	/**
+	 * Draws a string centered at a specific X coordinate on regular font.
+	 */
+	private void drawRegularString(final Screen screen, final String string, final int x, final int y) {
+		backBufferGraphics.setFont(fontRegular);
+		backBufferGraphics.drawString(string, x - fontRegularMetrics.stringWidth(string) / 2, y);
 	}
 
 	/**

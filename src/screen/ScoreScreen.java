@@ -45,6 +45,8 @@ public class ScoreScreen extends Screen {
 	private int nameCharSelected;
 	/** Time between changes in user selection. */
 	private Cooldown selectionCooldown;
+	/** Is the game in two-player mode? */
+	private boolean isTwoPlayer;
 
 	/**
 	 * Constructor, establishes the properties of the screen.
@@ -63,7 +65,8 @@ public class ScoreScreen extends Screen {
 		super(width, height, fps);
 
 		this.score = gameState.getScore();
-		if (gameState.isTwoPlayer()) {
+		this.isTwoPlayer = gameState.isTwoPlayer();
+		if (this.isTwoPlayer) {
 			this.score += gameState.getScoreP2();
 		}
 		this.livesRemaining = gameState.getLivesRemaining();
@@ -76,7 +79,7 @@ public class ScoreScreen extends Screen {
 		this.selectionCooldown.reset();
 
 		try {
-			this.highScores = Core.getFileManager().loadHighScores();
+			this.highScores = Core.getFileManager().loadHighScores(this.isTwoPlayer);
 			if (highScores.size() < MAX_HIGH_SCORE_NUM
 					|| highScores.get(highScores.size() - 1).getScore()
 					< this.score)
@@ -160,9 +163,9 @@ public class ScoreScreen extends Screen {
 			highScores.remove(highScores.size() - 1);
 
 		try {
-			Core.getFileManager().saveHighScores(highScores);
+			Core.getFileManager().saveHighScores(highScores, this.isTwoPlayer);
 		} catch (IOException e) {
-			logger.warning("Couldn't load high scores!");
+			logger.warning("Couldn't save high scores!");
 		}
 	}
 

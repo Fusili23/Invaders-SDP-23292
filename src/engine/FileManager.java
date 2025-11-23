@@ -169,11 +169,13 @@ public final class FileManager {
 	 * Loads high scores from file, and returns a sorted list of pairs score -
 	 * value.
 	 * 
+	 * @param isTwoPlayer
+	 *            True if loading 2-player scores, false for 1-player.
 	 * @return Sorted list of scores - players.
 	 * @throws IOException
 	 *             In case of loading problems.
 	 */
-	public List<Score> loadHighScores() throws IOException {
+	public List<Score> loadHighScores(boolean isTwoPlayer) throws IOException {
 
 		List<Score> highScores = new ArrayList<Score>();
 		InputStream inputStream = null;
@@ -186,14 +188,14 @@ public final class FileManager {
 
 			String scoresPath = new File(jarPath).getParent();
 			scoresPath += File.separator;
-			scoresPath += "scores";
+			scoresPath += isTwoPlayer ? "scores_2p" : "scores_1p";
 
 			File scoresFile = new File(scoresPath);
 			inputStream = new FileInputStream(scoresFile);
 			bufferedReader = new BufferedReader(new InputStreamReader(
 					inputStream, Charset.forName("UTF-8")));
 
-			logger.info("Loading user high scores.");
+			logger.info("Loading user high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
 
 			Score highScore = null;
 			String name = bufferedReader.readLine();
@@ -208,7 +210,7 @@ public final class FileManager {
 
 		} catch (FileNotFoundException e) {
 			// loads default if there's no user scores.
-			logger.info("Loading default high scores.");
+			logger.info("Loading default high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
 			highScores = loadDefaultHighScores();
 		} finally {
 			if (bufferedReader != null)
@@ -224,10 +226,12 @@ public final class FileManager {
 	 * 
 	 * @param highScores
 	 *            High scores to save.
+	 * @param isTwoPlayer
+	 *            True if saving 2-player scores, false for 1-player.
 	 * @throws IOException
 	 *             In case of loading problems.
 	 */
-	public void saveHighScores(final List<Score> highScores) 
+	public void saveHighScores(final List<Score> highScores, boolean isTwoPlayer)
 			throws IOException {
 		OutputStream outputStream = null;
 		BufferedWriter bufferedWriter = null;
@@ -239,7 +243,7 @@ public final class FileManager {
 
 			String scoresPath = new File(jarPath).getParent();
 			scoresPath += File.separator;
-			scoresPath += "scores";
+			scoresPath += isTwoPlayer ? "scores_2p" : "scores_1p";
 
 			File scoresFile = new File(scoresPath);
 
@@ -250,7 +254,7 @@ public final class FileManager {
 			bufferedWriter = new BufferedWriter(new OutputStreamWriter(
 					outputStream, Charset.forName("UTF-8")));
 
-			logger.info("Saving user high scores.");
+			logger.info("Saving user high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
 
 			// Saves 7 or less scores.
 			int savedCount = 0;
