@@ -667,7 +667,7 @@ public class GameScreen extends Screen {
         // Player 1 collision checks
         if (!this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed() && !this.ship.isInvincible()) {
             for (EnemyShip enemyShip : this.enemyShipFormation) {
-                if (checkCollision(this.ship, enemyShip)) {
+                if (!enemyShip.isDestroyed() && checkCollision(this.ship, enemyShip)) {
                     this.enemyShipFormation.destroy(enemyShip);
                     this.ship.destroy();
                     this.lives--;
@@ -717,7 +717,7 @@ public class GameScreen extends Screen {
         // Player 2 collision checks
         if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && !this.ship2.isDestroyed() && !this.ship2.isInvincible()) {
             for (EnemyShip enemyShip : this.enemyShipFormation) {
-                if (checkCollision(this.ship2, enemyShip)) {
+                if (!enemyShip.isDestroyed() && checkCollision(this.ship2, enemyShip)) {
                     this.enemyShipFormation.destroy(enemyShip);
                     this.ship2.destroy();
                     this.livesP2--;
