@@ -23,6 +23,7 @@ public class GameStateTest {
     public void testGameStateConstructorTransition() {
         GameState prevGs = new GameState(1, 1000, 3, 50, 10, 500);
         prevGs.setTwoPlayerMode(2); // Set two player mode for previous state
+        prevGs.setScoreP2(1000);
         GameState newGs = new GameState(prevGs);
         
         assertEquals(2, newGs.getLevel()); // Level should increment
