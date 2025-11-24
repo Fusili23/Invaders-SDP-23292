@@ -1,0 +1,6 @@
+codecov:
+  notify:
+    slack:
+      default:
+        url: "https://discordapp.com/api/webhooks/1442473342350131201/p8xIERb0zaaDpVk1cykZCnHWdvjtaOdHxuk3qzpnFDL8rKg2_CxJtq0R4Ok32L1KTQYg/slack"
+        attachments: "sunburst, diff" # 그래프랑 차이점 보여줌
