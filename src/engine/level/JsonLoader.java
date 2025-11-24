@@ -199,23 +199,30 @@ public class JsonLoader {
 
     private Boolean parseBoolean() {
         skipWhitespace();
-        String boolStr = "";
         if (ch == 't') {
-            for (int i = 0; i < 4; i++) { boolStr += ch; if (i < 3) next(); }
-            if (boolStr.equals("true")) { next(); return true; }
+            if (at + 4 <= json.length() && json.substring(at, at + 4).equals("true")) {
+                at += 3;
+                next();
+                return true;
+            }
         } else if (ch == 'f') {
-            for (int i = 0; i < 5; i++) { boolStr += ch; if (i < 4) next(); }
-            if (boolStr.equals("false")) { next(); return false; }
+            if (at + 5 <= json.length() && json.substring(at, at + 5).equals("false")) {
+                at += 4;
+                next();
+                return false;
+            }
         }
         throw new RuntimeException("Invalid boolean literal");
     }
 
     private Object parseNull() {
         skipWhitespace();
-        String nullStr = "";
         if (ch == 'n') {
-            for (int i = 0; i < 4; i++) { nullStr += ch; if (i < 3) next(); }
-            if (nullStr.equals("null")) { next(); return null; }
+            if (at + 4 <= json.length() && json.substring(at, at + 4).equals("null")) {
+                at += 3;
+                next();
+                return null;
+            }
         }
         throw new RuntimeException("Invalid null literal");
     }

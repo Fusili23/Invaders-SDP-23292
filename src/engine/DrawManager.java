@@ -359,7 +359,7 @@ public final class DrawManager {
 
         if (option == 3) backBufferGraphics.setColor(pulseColor);
         else backBufferGraphics.setColor(Color.WHITE);
-        drawCenteredRegularString(screen, highScoresString, screen.getHeight() / 3 * 2 + fontRegularMetrics.getHeight() * 1);
+        drawCenteredRegularString(screen, highScoresString, screen.getHeight() / 3 * 2 + fontRegularMetrics.getHeight());
 
         if (option == 6) backBufferGraphics.setColor(pulseColor);
         else backBufferGraphics.setColor(Color.WHITE);
@@ -482,10 +482,9 @@ public final class DrawManager {
     public void drawHighScores(final Screen screen, final List<Score> highScores) {
         backBufferGraphics.setColor(Color.WHITE);
         int i = 0;
-        String scoreString = "";
 		if (highScores != null) {
 			for (Score score : highScores) {
-				scoreString = String.format("%s        %04d", score.getName(), score.getScore());
+				String scoreString = String.format("%s        %04d", score.getName(), score.getScore());
 				drawCenteredRegularString(screen, scoreString, screen.getHeight() / 4 + fontRegularMetrics.getHeight() * (i + 1) * 2);
 				i++;
 			}
@@ -598,7 +597,7 @@ public final class DrawManager {
 		drawCenteredRegularString(screen, balanceString, 120);
 		// Draw instructions based on mode
 		backBufferGraphics.setColor(Color.GRAY);
-		String instructions = "";
+		String instructions;
 		if (selectionMode == 0) {
 			instructions = "W/S: Navigate | SPACE: Select | ESC: Exit";
 		} else {

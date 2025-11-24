@@ -214,7 +214,7 @@ public class EnemyShipFormation implements Iterable<EnemyShip> {
 
         final int cells = this.nShipsWide * this.nShipsHigh;
         List<SpriteType> spriteQueue = buildLayeredQueueFromLevel(level, this.nShipsWide, this.nShipsHigh);
-        boolean useQueue = (spriteQueue != null && spriteQueue.size() == cells);
+        boolean useQueue = (spriteQueue.size() == cells);
         int qIndex = 0;
 
         for (List<EnemyShip> column : this.enemyShips) {
@@ -524,8 +524,7 @@ public class EnemyShipFormation implements Iterable<EnemyShip> {
 		Set<EnemyShip> enemyShipsList = new HashSet<EnemyShip>();
 
 		for (List<EnemyShip> column : this.enemyShips)
-			for (EnemyShip enemyShip : column)
-				enemyShipsList.add(enemyShip);
+			enemyShipsList.addAll(column);
 
 		return enemyShipsList.iterator();
 	}

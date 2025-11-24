@@ -68,12 +68,12 @@ public final class FileManager {
 	 */
 	public void loadSprite(final Map<SpriteType, boolean[][]> spriteMap)
 			throws IOException {
-		InputStream inputStream = null;
-
-		try {
-			inputStream = DrawManager.class.getClassLoader()
-                    .getResourceAsStream("graphics");
-            char c;
+		try (InputStream inputStream = DrawManager.class.getClassLoader()
+				.getResourceAsStream("graphics")) {
+			if (inputStream == null) {
+				throw new IOException("Cannot find graphics resource.");
+			}
+			char c;
 
 			// Sprite loading.
 			for (Map.Entry<SpriteType, boolean[][]> sprite : spriteMap
@@ -91,11 +91,6 @@ public final class FileManager {
 					}
 				logger.fine("Sprite " + sprite.getKey() + " loaded.");
 			}
-			if (inputStream != null)
-				inputStream.close();
-		} finally {
-			if (inputStream != null)
-				inputStream.close();
 		}
 	}
 
@@ -119,6 +114,9 @@ public final class FileManager {
 			// Font loading.
 			inputStream = FileManager.class.getClassLoader()
 					.getResourceAsStream("font.ttf");
+			if (inputStream == null) {
+				throw new IOException("Cannot find font resource.");
+			}
 			font = Font.createFont(Font.TRUETYPE_FONT, inputStream).deriveFont(
 					size);
 		} finally {
@@ -139,27 +137,23 @@ public final class FileManager {
 	 */
 	private List<Score> loadDefaultHighScores() throws IOException {
 		List<Score> highScores = new ArrayList<Score>();
-		InputStream inputStream = null;
-		BufferedReader reader = null;
 
-		try {
-			inputStream = FileManager.class.getClassLoader()
-					.getResourceAsStream("scores");
-			reader = new BufferedReader(new InputStreamReader(inputStream));
-
-			Score highScore = null;
-			String name = reader.readLine();
-			String score = reader.readLine();
-
-			while ((name != null) && (score != null)) {
-				highScore = new Score(name, Integer.parseInt(score));
-				highScores.add(highScore);
-				name = reader.readLine();
-				score = reader.readLine();
+		try (InputStream inputStream = FileManager.class.getClassLoader()
+				.getResourceAsStream("scores")) {
+			if (inputStream == null) {
+				throw new IOException("Cannot find scores resource.");
 			}
-		} finally {
-			if (inputStream != null)
-				inputStream.close();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+				String name = reader.readLine();
+				String score = reader.readLine();
+
+				while ((name != null) && (score != null)) {
+					Score highScore = new Score(name, Integer.parseInt(score));
+					highScores.add(highScore);
+					name = reader.readLine();
+					score = reader.readLine();
+				}
+			}
 		}
 
 		return highScores;
@@ -178,8 +172,6 @@ public final class FileManager {
 	public List<Score> loadHighScores(boolean isTwoPlayer) throws IOException {
 
 		List<Score> highScores = new ArrayList<Score>();
-		InputStream inputStream = null;
-		BufferedReader bufferedReader = null;
 
 		try {
 			String jarPath = FileManager.class.getProtectionDomain()
@@ -191,30 +183,26 @@ public final class FileManager {
 			scoresPath += isTwoPlayer ? "scores_2p" : "scores_1p";
 
 			File scoresFile = new File(scoresPath);
-			inputStream = new FileInputStream(scoresFile);
-			bufferedReader = new BufferedReader(new InputStreamReader(
-					inputStream, Charset.forName("UTF-8")));
+			try (InputStream inputStream = new FileInputStream(scoresFile);
+				 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+						 inputStream, Charset.forName("UTF-8")))) {
 
-			logger.info("Loading user high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
+				logger.info("Loading user high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
 
-			Score highScore = null;
-			String name = bufferedReader.readLine();
-			String score = bufferedReader.readLine();
+				String name = bufferedReader.readLine();
+				String score = bufferedReader.readLine();
 
-			while ((name != null) && (score != null)) {
-				highScore = new Score(name, Integer.parseInt(score));
-				highScores.add(highScore);
-				name = bufferedReader.readLine();
-				score = bufferedReader.readLine();
+				while ((name != null) && (score != null)) {
+					Score highScore = new Score(name, Integer.parseInt(score));
+					highScores.add(highScore);
+					name = bufferedReader.readLine();
+					score = bufferedReader.readLine();
+				}
 			}
-
 		} catch (FileNotFoundException e) {
 			// loads default if there's no user scores.
 			logger.info("Loading default high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
 			highScores = loadDefaultHighScores();
-		} finally {
-			if (bufferedReader != null)
-				bufferedReader.close();
 		}
 
 		Collections.sort(highScores);
@@ -233,9 +221,6 @@ public final class FileManager {
 	 */
 	public void saveHighScores(final List<Score> highScores, boolean isTwoPlayer)
 			throws IOException {
-		OutputStream outputStream = null;
-		BufferedWriter bufferedWriter = null;
-
 		try {
 			String jarPath = FileManager.class.getProtectionDomain()
 					.getCodeSource().getLocation().getPath();
@@ -247,30 +232,35 @@ public final class FileManager {
 
 			File scoresFile = new File(scoresPath);
 
-			if (!scoresFile.exists())
-				scoresFile.createNewFile();
-
-			outputStream = new FileOutputStream(scoresFile);
-			bufferedWriter = new BufferedWriter(new OutputStreamWriter(
-					outputStream, Charset.forName("UTF-8")));
-
-			logger.info("Saving user high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
-
-			// Saves 7 or less scores.
-			int savedCount = 0;
-			for (Score score : highScores) {
-				if (savedCount >= MAX_SCORES)
-					break;
-				bufferedWriter.write(score.getName());
-				bufferedWriter.newLine();
-				bufferedWriter.write(Integer.toString(score.getScore()));
-				bufferedWriter.newLine();
-				savedCount++;
+			if (!scoresFile.exists()) {
+				if (scoresFile.createNewFile()) {
+					logger.info("Created new scores file at " + scoresPath);
+				} else {
+					logger.warning("Failed to create new scores file at " + scoresPath);
+				}
 			}
 
-		} finally {
-			if (bufferedWriter != null)
-				bufferedWriter.close();
+			try (OutputStream outputStream = new FileOutputStream(scoresFile);
+				 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+						 outputStream, Charset.forName("UTF-8")))) {
+
+				logger.info("Saving user high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
+
+				// Saves 7 or less scores.
+				int savedCount = 0;
+				for (Score score : highScores) {
+					if (savedCount >= MAX_SCORES)
+						break;
+					bufferedWriter.write(score.getName());
+					bufferedWriter.newLine();
+					bufferedWriter.write(Integer.toString(score.getScore()));
+					bufferedWriter.newLine();
+					savedCount++;
+				}
+			}
+		} catch (IOException e) {
+			logger.warning("Couldn't save high scores for " + (isTwoPlayer ? "2P" : "1P") + " mode.");
+			throw e;
 		}
 	}
 	/**

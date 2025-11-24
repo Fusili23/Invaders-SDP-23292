@@ -14,9 +14,9 @@ import java.util.logging.Logger;
  */
 public abstract class MidBoss extends Entity implements BossEntity {
 
-	protected int healPoint=10;
-	protected int maxHp=healPoint;
-	protected int pointValue=500;
+	protected int healPoint;
+	protected int maxHp;
+	protected int pointValue;
 	protected boolean isDestroyed=false;
 	protected int pattern=1;
 	protected Screen screen;

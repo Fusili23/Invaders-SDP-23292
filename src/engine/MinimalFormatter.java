@@ -17,8 +17,7 @@ public class MinimalFormatter extends Formatter {
 	/** Format for the date. */
 	private static final DateFormat FORMAT = new SimpleDateFormat("h:mm:ss");
 	/** System line separator. */
-	private static final String LINE_SEPARATOR = System
-			.getProperty("line.separator");
+	private static final String LINE_SEPARATOR = System.lineSeparator();
 
 	@Override
 	public final String format(final LogRecord logRecord) {

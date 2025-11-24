@@ -523,7 +523,7 @@ public class GameScreen extends Screen {
 						}
 					}
 				}
-				if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && checkCollision(bullet, this.ship2) && !this.levelFinished) {
+				if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && checkCollision(bullet, this.ship2) && !this.levelFinished) {
 					recyclable.add(bullet);
 					if (!this.ship2.isInvincible()) {
 						if (!this.ship2.isDestroyed()) {
@@ -715,7 +715,7 @@ public class GameScreen extends Screen {
         }
 
         // Player 2 collision checks
-        if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && !this.ship2.isDestroyed() && !this.ship2.isInvincible()) {
+        if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && !this.ship2.isDestroyed() && !this.ship2.isInvincible()) {
             for (EnemyShip enemyShip : this.enemyShipFormation) {
                 if (!enemyShip.isDestroyed() && checkCollision(this.ship2, enemyShip)) {
                     this.enemyShipFormation.destroy(enemyShip);
@@ -994,7 +994,7 @@ public class GameScreen extends Screen {
 					bulletsToRemove.add(b);
 				}
 				/** If the bullet collides with ship2 */
-				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.ship2 != null && this.checkCollision(b, this.ship2)) {
+				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.checkCollision(b, this.ship2)) {
 					if (!this.ship2.isDestroyed()) {
 						this.ship2.destroy();
 						this.livesP2--;

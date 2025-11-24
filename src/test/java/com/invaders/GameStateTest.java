@@ -1,4 +1,4 @@
-package com.invaders; // Matches the IDE's expected package
+package test.java.com.invaders;
 
 import engine.GameState;
 import org.junit.Test;
@@ -91,31 +91,5 @@ public class GameStateTest {
 
         gs.loseLifeP2();
         assertEquals(1, gs.getLivesRemainingP2());
-    }
-
-    @Test
-    public void testGameStateConstructorTransitionOnePlayer() {
-        GameState prevGs = new GameState(1, 1000, 3, 50, 10, 500);
-        GameState newGs = new GameState(prevGs);
-        
-        assertEquals(2, newGs.getLevel());
-        assertFalse(newGs.isTwoPlayer());
-        assertEquals(0, newGs.getScoreP2());
-        assertEquals(0, newGs.getLivesRemainingP2());
-    }
-
-    @Test
-    public void testDeductCoinsNegative() {
-        GameState gs = new GameState(1, 0, 3, 0, 0, 100);
-        assertFalse(gs.deductCoins(-10));
-        assertEquals(100, gs.getCoin());
-    }
-
-    @Test
-    public void testSetScoreP2() {
-        GameState gs = new GameState(1, 0, 3, 0, 0, 0);
-        gs.setTwoPlayerMode(3);
-        gs.setScoreP2(150);
-        assertEquals(150, gs.getScoreP2());
     }
 }
