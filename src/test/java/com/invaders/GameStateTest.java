@@ -1,4 +1,4 @@
-package test.java.com.invaders;
+package com.invaders; // Matches the IDE's expected package
 
 import engine.GameState;
 import org.junit.Test;

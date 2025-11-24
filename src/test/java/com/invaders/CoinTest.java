@@ -1,4 +1,4 @@
-package test.java.com.invaders;
+package com.invaders;
 
 import engine.Coin;
 import org.junit.Test;
