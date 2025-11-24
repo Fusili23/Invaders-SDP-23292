@@ -30,6 +30,8 @@ import engine.level.LevelManager;
  */
 public class GameScreen extends Screen {
 
+	// --- Add this below your other private fields ---
+	private HiddenStageManager hiddenStageManager; // For Easter egg/hidden stage logic
 	/** Milliseconds until the screen accepts user input. */
 	private static final int INPUT_DELAY = 6000;
 	/** Bonus score for each life remaining at the end of the level. */
@@ -182,6 +184,7 @@ public class GameScreen extends Screen {
 	public final void initialize() {
 		super.initialize();
         /** Initialize the bullet Boss fired */
+		this.hiddenStageManager = new HiddenStageManager();
 		this.bossBullets = new HashSet<>();
         enemyShipFormation = new EnemyShipFormation(this.currentLevel);
 		enemyShipFormation.attach(this);
@@ -294,6 +297,14 @@ public class GameScreen extends Screen {
 				}
 			}
 
+			// === Add this check after input / before or after main game/boss phase logic ===
+			if (gameState.getLevel() == 2 &&
+					!hiddenStageManager.isInHiddenStage() &&
+					isEasterEggTriggered()
+			) {
+				hiddenStageManager.enterHiddenStage(gameState);
+				this.logger.info("=== Entered hidden stage! ===");
+			}
 
 			switch (this.currentPhase) {
 				case wave:
@@ -808,10 +819,10 @@ public class GameScreen extends Screen {
         int centerAY = a.getPositionY() + a.getHeight() / 2;
         int centerBX = b.getPositionX() + b.getWidth() / 2;
         int centerBY = b.getPositionY() + b.getHeight() / 2;
-        
+
         double distanceX = centerAX - centerBX;
         double distanceY = centerAY - centerBY;
-        
+
         return (int) Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     }
 
@@ -843,7 +854,17 @@ public class GameScreen extends Screen {
         this.achievementPopupCooldown.reset();
     }
 
-    /**
+	/** Returns true if the ship is in the hidden-stage trigger area. */
+	private boolean isEasterEggTriggered() {
+		int targetX = this.width / 2;
+		int targetY = SEPARATION_LINE_HEIGHT + 10;
+		int tolerance = 10;
+		return Math.abs(this.ship.getPositionX() - targetX) < tolerance
+				&& Math.abs(this.ship.getPositionY() - targetY) < tolerance;
+	}
+
+
+	/**
      * Displays a notification popup when the player gains or loses health
      *
      *  @param message
@@ -939,7 +960,7 @@ public class GameScreen extends Screen {
 				break;
 			case "omegaBoss":
 			case "omegaAndFinal":
-				this.omegaBoss = new OmegaBoss(Color.ORANGE, ITEMS_SEPARATION_LINE_HEIGHT);
+				this.omegaBoss = new OmegaBoss(Color.ORANGE, ITEMS_SEPARATION_LINE_HEIGHT, this.hiddenStageManager, this.gameState);
 				omegaBoss.attach(this);
 				this.logger.info("Omega Boss has spawned!");
 				break;

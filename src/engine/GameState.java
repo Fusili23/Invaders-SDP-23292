@@ -8,6 +8,9 @@ package engine;
  */
 public class GameState {
 
+	/** [Easter egg] Special value for hidden stage entry. */
+	public static final int HIDDEN_STAGE = -1;
+
 	/** Current game level. */
 	private int level;
 	/** Current score. */
@@ -18,40 +21,33 @@ public class GameState {
 	private int bulletsShot;
 	/** Ships destroyed until now. */
 	private int shipsDestroyed;
-    /** Current coin. */
-    private int coin;
+	/** Current coin. */
+	private int coin;
 
 	// Fields for 2P mode
 	private boolean isTwoPlayer = false;
 	private int scoreP2 = 0;
 	private int livesRemainingP2 = 0;
 
-
 	/**
 	 * Constructor.
 	 *
-	 * @param level
-	 *            Current game level.
-	 * @param score
-	 *            Current score.
-	 * @param livesRemaining
-	 *            Lives currently remaining.
-	 * @param bulletsShot
-	 *            Bullets shot until now.
-	 * @param shipsDestroyed
-	 *            Ships destroyed until now.
-	 * @param coin
-	 *            Current coin.
+	 * @param level          Current game level.
+	 * @param score          Current score.
+	 * @param livesRemaining Lives currently remaining.
+	 * @param bulletsShot    Bullets shot until now.
+	 * @param shipsDestroyed Ships destroyed until now.
+	 * @param coin           Current coin.
 	 */
 	public GameState(final int level, final int score,
-			final int livesRemaining, final int bulletsShot,
-			final int shipsDestroyed, final int coin) {
+					 final int livesRemaining, final int bulletsShot,
+					 final int shipsDestroyed, final int coin) {
 		this.level = level;
 		this.score = score;
 		this.livesRemaining = livesRemaining;
 		this.bulletsShot = bulletsShot;
-        this.shipsDestroyed = shipsDestroyed;
-        this.coin = coin;
+		this.shipsDestroyed = shipsDestroyed;
+		this.coin = coin;
 	}
 
 	/**
@@ -74,7 +70,40 @@ public class GameState {
 	}
 
 	/**
-	 * Activates 2-player mode.
+	 * [Easter egg] Clones current game state for hidden stage transition.
+	 * @return Deep copy of the current GameState.
+	 */
+	public GameState clone() {
+		GameState copy = new GameState(
+				this.level, this.score, this.livesRemaining,
+				this.bulletsShot, this.shipsDestroyed, this.coin
+		);
+		// Clone 2P mode data as well
+		copy.isTwoPlayer = this.isTwoPlayer;
+		copy.scoreP2 = this.scoreP2;
+		copy.livesRemainingP2 = this.livesRemainingP2;
+		return copy;
+	}
+
+	/**
+	 * [Easter egg] Restores game state from a backup after hidden stage completion.
+	 * @param state The GameState to restore from.
+	 */
+	public void restore(GameState state) {
+		this.level = state.level;
+		this.score = state.score;
+		this.livesRemaining = state.livesRemaining;
+		this.bulletsShot = state.bulletsShot;
+		this.shipsDestroyed = state.shipsDestroyed;
+		this.coin = state.coin;
+
+		this.isTwoPlayer = state.isTwoPlayer;
+		this.scoreP2 = state.scoreP2;
+		this.livesRemainingP2 = state.livesRemainingP2;
+	}
+
+	/**
+	 * Activates 2-player mode with starting lives.
 	 * @param startingLivesP2 lives for player 2.
 	 */
 	public final void setTwoPlayerMode(int startingLivesP2) {
@@ -82,30 +111,30 @@ public class GameState {
 		this.livesRemainingP2 = startingLivesP2;
 	}
 
-	/**
-	 * @return True if the game is in 2-player mode.
-	 */
+	/** @return True if the game is in 2-player mode. */
 	public final boolean isTwoPlayer() {
 		return this.isTwoPlayer;
 	}
 
-	/**
-	 * @return the level
-	 */
+	/** @return the level */
 	public final int getLevel() {
 		return level;
 	}
 
 	/**
-	 * @return the score
+	 * [Easter egg] Sets the game level, e.g. for hidden stage transitions.
+	 * @param level New game level value.
 	 */
+	public final void setLevel(int level) {
+		this.level = level;
+	}
+
+	/** @return the score */
 	public final int getScore() {
 		return score;
 	}
 
-	/**
-	 * @return the score for player 2
-	 */
+	/** @return the score for player 2 */
 	public final int getScoreP2() {
 		return scoreP2;
 	}
@@ -134,50 +163,44 @@ public class GameState {
 		this.scoreP2 = score;
 	}
 
-	/**
-	 * @return the livesRemaining
-	 */
+	/** @return the livesRemaining */
 	public final int getLivesRemaining() {
 		return livesRemaining;
 	}
 
-	/**
-	 * @return the livesRemaining for player 2
-	 */
+	/** @return the livesRemaining for player 2 */
 	public final int getLivesRemainingP2() {
 		return livesRemainingP2;
 	}
 
-	/**
-	 * Player 1 loses a life.
-	 */
+	/** Player 1 loses a life. */
 	public final void loseLife() {
 		this.livesRemaining--;
 	}
 
-	/**
-	 * Player 2 loses a life.
-	 */
+	/** Player 2 loses a life. */
 	public final void loseLifeP2() {
 		this.livesRemainingP2--;
 	}
 
-	/**
-	 * @return the bulletsShot
-	 */
+	/** @return the bulletsShot */
 	public final int getBulletsShot() {
 		return bulletsShot;
 	}
 
-	/**
-	 * @return the shipsDestroyed
-	 */
+	/** @return the shipsDestroyed */
 	public final int getShipsDestroyed() {
 		return shipsDestroyed;
 	}
 
-    public final int getCoin() { return coin; }
+	/** @return the current coin count */
+	public final int getCoin() { return coin; }
 
+	/**
+	 * Deducts coins if amount is valid and there are enough coins.
+	 * @param amount Amount to deduct.
+	 * @return True if coins were successfully deducted.
+	 */
 	public final boolean deductCoins(final int amount) {
 		if (amount < 0) {
 			return false;
@@ -189,12 +212,20 @@ public class GameState {
 		return false;
 	}
 
+	/**
+	 * Adds coins.
+	 * @param amount Amount to add.
+	 */
 	public final void addCoins(final int amount) {
 		if (amount > 0) {
 			this.coin += amount;
 		}
 	}
 
+	/**
+	 * Sets the coin count.
+	 * @param amount New coin value.
+	 */
 	public final void setCoins(final int amount) {
 		if (amount >= 0) {
 			this.coin = amount;
