@@ -2,7 +2,7 @@ package entity;
 
 import engine.GameState;
 
-/**l
+/**
  * Manages hidden stage transitions (Easter egg feature).
  */
 public class HiddenStageManager {
