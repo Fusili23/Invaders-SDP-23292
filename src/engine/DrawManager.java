@@ -250,12 +250,12 @@ public final class DrawManager {
 			backBufferGraphics.drawString("P1", 20, 40);
 			Ship dummyShip = new Ship(0, 0, Color.GREEN);
 			for (int i = 0; i < lives; i++)
-				drawEntity(dummyShip, 50 + 15 * i, 28);
+ 				drawEntity(dummyShip, 50 + 30 * i, 28);
 		} else {
 			backBufferGraphics.drawString("P2", screen.getWidth() - 120, 40);
 			Ship dummyShip = new Ship(0, 0, Color.CYAN);
 			for (int i = 0; i < lives; i++)
-				drawEntity(dummyShip, screen.getWidth() - 90 + 15 * i, 28);
+				drawEntity(dummyShip, screen.getWidth() - 90 + 30 * i, 28);
 		}
 	}
 
