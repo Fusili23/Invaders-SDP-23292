@@ -1,4 +1,4 @@
-package com.invaders;
+package test.java.com.invaders;
 
 import engine.Achievement;
 import engine.AchievementManager;
