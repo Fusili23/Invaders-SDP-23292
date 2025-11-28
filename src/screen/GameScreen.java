@@ -345,7 +345,13 @@ public class GameScreen extends Screen {
 
 		if (this.gameTimer.isRunning()) {
             this.elapsedTime = this.gameTimer.getElapsedTime();
-				AchievementManager.getInstance().onTimeElapsedSeconds((int)(this.elapsedTime / 1000));
+			/**calculate the time*/
+			int seconds = (int)(this.elapsedTime/1000);
+			/**get achievement name what they achieve*/
+			String unlockedAchievement = AchievementManager.getInstance().onTimeElapsedSeconds(seconds);
+			if (unlockedAchievement != null) {
+				showAchievement(unlockedAchievement);
+			}
         }
         cleanItems();
         manageBulletShipCollisions();
@@ -371,13 +377,14 @@ public class GameScreen extends Screen {
 					this.logger.info("Awarded " + this.currentLevel.getCompletionBonus().getCurrency() + " coins for level completion.");
 				}
 
-				String achievement = this.currentLevel.getAchievementTrigger();
-				if (achievement != null && !achievement.isEmpty()) {
-					if (AchievementManager.getInstance().unlockAchievement(achievement)){
-						showAchievement(achievement);
-					}	/** popup achievement at gamescrean when player clear level**/
-					this.logger.info("Unlocked achievement: " + achievement);
+				/** popup achievement at gamescrean when player clear level**/
+				String unlockedLevelAchievement = AchievementManager.getInstance().onLevelFinished(this.level);
+
+				if (unlockedLevelAchievement != null) {
+					showAchievement(unlockedLevelAchievement);
+					this.logger.info("Achievement unlocked: " + unlockedLevelAchievement);
 				}
+
 			}
 			this.isRunning = false;
 		}

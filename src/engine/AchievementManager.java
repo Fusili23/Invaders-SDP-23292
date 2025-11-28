@@ -25,6 +25,10 @@ public class AchievementManager {
     /** Flag to ensure the 'Bad Sniper' achievement is unlocked only once. */
     private boolean sniperUnlocked = false;
     /** Flag to ensure the 'Bear Grylls' achievement is unlocked only once. */
+    private boolean beginnerUnlocked = false;
+    /** Flag to ensure the 'Beginner' achievement is unlocked only once. */
+    private boolean intermediateUnlocked = false;
+    /** Flag to ensure the 'Intermediate' achievement is unlocked only once. */
     private boolean survivorUnlocked = false;
 
     /**
@@ -126,6 +130,27 @@ public class AchievementManager {
             }
         }
         return null;
+    }
+    public String onLevelFinished(int level) {
+        String unlockedName = null;
+
+        // level 1 clear -> Beginner
+        if (level == 1 && !beginnerUnlocked) {
+            if (unlockAchievement("Beginner")) {
+                unlockedName = "Beginner";
+                beginnerUnlocked = true;
+            }
+        }
+
+        // level 3 clear -> Intermediate
+        if (level == 3 && !intermediateUnlocked) {
+            if (unlockAchievement("Intermediate")) {
+                unlockedName = "Intermediate";
+                intermediateUnlocked = true;
+            }
+        }
+
+        return unlockedName;
     }
 
     /**
