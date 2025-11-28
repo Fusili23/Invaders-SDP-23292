@@ -25,13 +25,17 @@ public class AchievementManager {
     /** Flag to ensure the 'Bad Sniper' achievement is unlocked only once. */
     private boolean sniperUnlocked = false;
     /** Flag to ensure the 'Bear Grylls' achievement is unlocked only once. */
+    private boolean beginnerUnlocked = false;
+    /** Flag to ensure the 'Beginner' achievement is unlocked only once. */
+    private boolean intermediateUnlocked = false;
+    /** Flag to ensure the 'Intermediate' achievement is unlocked only once. */
     private boolean survivorUnlocked = false;
 
     /**
      * Private constructor to initialize the achievement list and load their status.
      * Part of the Singleton pattern.
      */
-    private AchievementManager() {
+    public AchievementManager() {
         achievements = new ArrayList<>();
         achievements.add(new Achievement("Beginner", "Clear level 1"));
         achievements.add(new Achievement("Intermediate", "Clear level 3"));
@@ -127,6 +131,27 @@ public class AchievementManager {
         }
         return null;
     }
+    public String onLevelFinished(int level) {
+        String unlockedName = null;
+
+        // level 1 clear -> Beginner
+        if (level == 1 && !beginnerUnlocked) {
+            if (unlockAchievement("Beginner")) {
+                unlockedName = "Beginner";
+                beginnerUnlocked = true;
+            }
+        }
+
+        // level 3 clear -> Intermediate
+        if (level == 3 && !intermediateUnlocked) {
+            if (unlockAchievement("Intermediate")) {
+                unlockedName = "Intermediate";
+                intermediateUnlocked = true;
+            }
+        }
+
+        return unlockedName;
+    }
 
     /**
      * Handles the game event when a shot is fired.
@@ -180,6 +205,16 @@ public class AchievementManager {
             e.printStackTrace();
         }
     }
+    public void resetAchievementsForTest() {
+        this.beginnerUnlocked = false;
+        this.intermediateUnlocked = false;
+        this.survivorUnlocked = false;
 
+        achievements = new ArrayList<>();
+        achievements.add(new Achievement("Beginner", "Clear level 1"));
+        achievements.add(new Achievement("Intermediate", "Clear level 3"));
+        achievements.add(new Achievement("Bear Grylls", "Survive for 60 seconds"));
+
+    }
 
 }

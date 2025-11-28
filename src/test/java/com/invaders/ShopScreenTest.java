@@ -1,4 +1,4 @@
-package com.invaders;
+package test.java.com.invaders;
 
 import engine.GameState;
 import screen.ShopScreen;
