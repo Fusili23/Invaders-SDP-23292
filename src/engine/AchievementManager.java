@@ -35,7 +35,7 @@ public class AchievementManager {
      * Private constructor to initialize the achievement list and load their status.
      * Part of the Singleton pattern.
      */
-    private AchievementManager() {
+    public AchievementManager() {
         achievements = new ArrayList<>();
         achievements.add(new Achievement("Beginner", "Clear level 1"));
         achievements.add(new Achievement("Intermediate", "Clear level 3"));
@@ -205,6 +205,16 @@ public class AchievementManager {
             e.printStackTrace();
         }
     }
+    public void resetAchievementsForTest() {
+        this.beginnerUnlocked = false;
+        this.intermediateUnlocked = false;
+        this.survivorUnlocked = false;
 
+        achievements = new ArrayList<>();
+        achievements.add(new Achievement("Beginner", "Clear level 1"));
+        achievements.add(new Achievement("Intermediate", "Clear level 3"));
+        achievements.add(new Achievement("Bear Grylls", "Survive for 60 seconds"));
+
+    }
 
 }
