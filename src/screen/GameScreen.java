@@ -125,6 +125,7 @@ public class GameScreen extends Screen {
   /** Health change popup. */
   private String healthPopupText;
   private Cooldown healthPopupCooldown;
+  private boolean achievementTriggered = false;
 
 	    private GameState gameState;
 
@@ -368,26 +369,33 @@ public class GameScreen extends Screen {
 				this.gameTimer.stop();
 			}
 		}
+		if (this.levelFinished && !this.achievementTriggered) {
+			this.achievementTriggered = true;
 
-		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
+			if (this.gameTimer.isRunning()) {
+				this.gameTimer.stop();
+			}
+
 			boolean anyPlayerWon = this.lives > 0 || (this.isTwoPlayer && this.livesP2 > 0);
-			if (anyPlayerWon) { // Check for win condition
+			if (anyPlayerWon) {
+
 				if (this.currentLevel.getCompletionBonus() != null) {
 					this.coin += this.currentLevel.getCompletionBonus().getCurrency();
-					this.logger.info("Awarded " + this.currentLevel.getCompletionBonus().getCurrency() + " coins for level completion.");
+					this.logger.info("Awarded coins for level completion.");
 				}
 
 				/** popup achievement at gamescrean when player clear level**/
 				String unlockedLevelAchievement = AchievementManager.getInstance().onLevelFinished(this.level);
-
 				if (unlockedLevelAchievement != null) {
 					showAchievement(unlockedLevelAchievement);
 					this.logger.info("Achievement unlocked: " + unlockedLevelAchievement);
 				}
-
 			}
+		}
+		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
 			this.isRunning = false;
 		}
+
 	}
 
 
