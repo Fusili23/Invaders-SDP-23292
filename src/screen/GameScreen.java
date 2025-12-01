@@ -879,10 +879,10 @@ public class GameScreen extends Screen {
      * @return Current game state.
 	 */
 	    public final GameState getGameState() {
-		if (this.coin > 2000) {
+		if (this.coin > 500) {
 			if (AchievementManager.getInstance().unlockAchievement("Mr. Greedy")){
 				showAchievement("Mr.Greedy");
-			}/**popup achievement at gamescrean when player get over 2000 coins **/
+			}/**popup achievement at gamescrean when player get over 500 coins **/
 		}
 		GameState newGameState = new GameState(this.level, this.score, this.lives,
 				this.bulletsShot, this.shipsDestroyed,this.coin);
