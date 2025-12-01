@@ -30,6 +30,9 @@ public class AchievementManager {
     private boolean intermediateUnlocked = false;
     /** Flag to ensure the 'Intermediate' achievement is unlocked only once. */
     private boolean survivorUnlocked = false;
+    private boolean conquerorUnlocked = false;
+    private boolean bossSlayerUnlocked = false;
+    private boolean mrGreedyUnlocked = false;
 
     /**
      * Private constructor to initialize the achievement list and load their status.
@@ -40,7 +43,7 @@ public class AchievementManager {
         achievements.add(new Achievement("Beginner", "Clear level 1"));
         achievements.add(new Achievement("Intermediate", "Clear level 3"));
         achievements.add(new Achievement("Boss Slayer", "Defeat a boss"));
-        achievements.add(new Achievement("Mr. Greedy", "Have more than 2000 coins"));
+        achievements.add(new Achievement("Mr. Greedy", "Have more than 500 coins"));
         achievements.add(new Achievement("First Blood", "Defeat your first enemy"));
         achievements.add(new Achievement("Bear Grylls", "Survive for 60 seconds"));
         achievements.add(new Achievement("Bad Sniper", "Under 80% accuracy"));
@@ -149,6 +152,18 @@ public class AchievementManager {
                 intermediateUnlocked = true;
             }
         }
+        if (level == 1 && !beginnerUnlocked) {
+            if (unlockAchievement("Beginner")) {
+                unlockedName = "Beginner";
+                beginnerUnlocked = true;
+            }
+        }
+        if (level == 7 && !conquerorUnlocked) {
+            if (unlockAchievement("Conqueror")) {
+                unlockedName = "Conqueror";
+                conquerorUnlocked = true;
+            }
+        }
 
         return unlockedName;
     }
@@ -209,11 +224,21 @@ public class AchievementManager {
         this.beginnerUnlocked = false;
         this.intermediateUnlocked = false;
         this.survivorUnlocked = false;
+        this.firstKillUnlocked = false;
+        this.sniperUnlocked = false;
+        this.conquerorUnlocked = false;
+        this.shotsFired = 0;
+        this.shotsHit = 0;
 
         achievements = new ArrayList<>();
         achievements.add(new Achievement("Beginner", "Clear level 1"));
         achievements.add(new Achievement("Intermediate", "Clear level 3"));
         achievements.add(new Achievement("Bear Grylls", "Survive for 60 seconds"));
+        achievements.add(new Achievement("Boss Slayer", "Defeat a boss"));
+        achievements.add(new Achievement("Mr. Greedy", "Have more than 500 coins"));
+        achievements.add(new Achievement("First Blood", "Defeat your first enemy"));
+        achievements.add(new Achievement("Bad Sniper", "Under 80% accuracy"));
+        achievements.add(new Achievement("Conqueror", "Clear the final level"));
 
     }
 
