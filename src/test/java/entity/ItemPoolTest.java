@@ -13,7 +13,7 @@ public class ItemPoolTest {
     @Test
     public void getItem_returnsNewItemWhenPoolEmpty() {
         DropItem item = ItemPool.getItem(10, 20, 5, ItemType.Heal);
-        assertEquals(10, item.getPositionX()); // Adjusted for width
+        assertEquals(5, item.getPositionX()); // Adjusted for width (10 - 10/2 = 5)
         assertEquals(20, item.getPositionY());
         assertEquals(5, item.getSpeed());
         assertEquals(ItemType.Heal, item.getItemType());

@@ -12,7 +12,7 @@ public class BulletPoolTest {
     @Test
     public void getBullet_returnsNewBulletWhenPoolEmpty() {
         Bullet bullet = BulletPool.getBullet(10, 20, 5);
-        assertEquals(10, bullet.getPositionX()); // Adjusted for width in getBullet
+        assertEquals(7, bullet.getPositionX()); // Adjusted for width (10 - 6/2 = 7)
         assertEquals(20, bullet.getPositionY());
         assertEquals(5, bullet.getSpeed());
     }
