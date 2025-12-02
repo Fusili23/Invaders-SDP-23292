@@ -91,16 +91,28 @@ public class CooldownTest {
     public void reset_withVariance_usesRandomGeneratorDeterministically() {
         // Use a fixed seed for predictable "random" numbers.
         Random seededRandom = new Random(12345L);
-        // With a seed of 12345L, the first nextInt(41) call will be 16.
-        // Duration = min + random_val = 80 + 16 = 96
         
-        Cooldown cd = new Cooldown(100, 20, mockClock, seededRandom);
+        // Calculate the expected duration using the same logic as Cooldown.reset()
+        int milliseconds = 100;
+        int variance = 20;
+        int min = milliseconds - variance;  // 80
+        int max = milliseconds + variance;  // 120
+        
+        // Generate the same random value that the Cooldown will use
+        int randomValue = seededRandom.nextInt(max - min + 1);
+        int expectedDuration = min + randomValue;
+        
+        // Create a new Random with the same seed for the Cooldown
+        Random cooldownRandom = new Random(12345L);
+        Cooldown cd = new Cooldown(milliseconds, variance, mockClock, cooldownRandom);
         cd.reset();
 
-        mockClock.advance(95);
-        assertFalse("Should be active before the random duration (96ms).", cd.checkFinished());
+        // Test that it's still active just before the expected duration
+        mockClock.advance(expectedDuration - 1);
+        assertFalse("Should be active before the random duration (" + expectedDuration + "ms).", cd.checkFinished());
         
+        // Test that it's finished exactly at the expected duration
         mockClock.advance(1);
-        assertTrue("Should be finished at the random duration (96ms).", cd.checkFinished());
+        assertTrue("Should be finished at the random duration (" + expectedDuration + "ms).", cd.checkFinished());
     }
 }
