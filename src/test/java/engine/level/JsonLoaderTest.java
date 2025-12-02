@@ -1,7 +1,5 @@
-package com.invaders;
+package engine.level;
 
-import engine.level.JsonLoader;
-import engine.level.Level;
 import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
@@ -12,25 +10,38 @@ public class JsonLoaderTest {
 
     @Test
     public void parse_validJson_returnsCorrectLevelList() throws IOException {
-        String jsonContent = "{\n" +
-                "  \"levels\": [\n" +
-                "    {\n" +
-                "      \"level\": 1,\n" +
-                "      \"levelName\": \"Test Level 1\",\n" +
-                "      \"formationWidth\": 5,\n" +
-                "      \"formationHeight\": 4,\n" +
-                "      \"baseSpeed\": 60,\n" +
-                "      \"shootingFrecuency\": 2000\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"level\": 2,\n" +
-                "      \"levelName\": \"Test Level 2\",\n" +
-                "      \"formationWidth\": 6,\n" +
-                "      \"formationHeight\": 5,\n" +
-                "      \"baseSpeed\": 50,\n" +
-                "      \"shootingFrecuency\": 2500\n" +
-                "    }\n" +
-                "  ]\n" +
+        String jsonContent = "{\"levels\": [
+" +
+                "    {\"level\": 1,
+" +
+                "      \"levelName\": \"Test Level 1\",
+" +
+                "      \"formationWidth\": 5,
+" +
+                "      \"formationHeight\": 4,
+" +
+                "      \"baseSpeed\": 60,
+" +
+                "      \"shootingFrecuency\": 2000
+" +
+                "    },
+" +
+                "    {\"level\": 2,
+" +
+                "      \"levelName\": \"Test Level 2\",
+" +
+                "      \"formationWidth\": 6,
+" +
+                "      \"formationHeight\": 5,
+" +
+                "      \"baseSpeed\": 50,
+" +
+                "      \"shootingFrecuency\": 2500
+" +
+                "    }
+" +
+                "  ]
+" +
                 "}";
 
         List<Level> levels = JsonLoader.parse(jsonContent);
@@ -67,7 +78,7 @@ public class JsonLoaderTest {
 
     @Test(expected = IOException.class)
     public void parse_malformedJson_throwsIOException() throws IOException {
-        String jsonContent = "{\"levels\": [{\"level\": 1, }]\n"; // Malformed JSON with trailing comma
+        String jsonContent = "{\"levels\": [{\"level\": 1, }]} "; // Malformed JSON with trailing comma
         JsonLoader.parse(jsonContent);
     }
 

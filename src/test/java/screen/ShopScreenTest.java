@@ -1,8 +1,7 @@
-package com.invaders;
+package screen;
 
 import engine.GameState;
 import entity.ShopItem;
-import screen.ShopScreen;
 import org.junit.Before;
 import org.junit.Test;
 

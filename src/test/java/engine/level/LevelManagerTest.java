@@ -1,7 +1,5 @@
-package com.invaders;
+package engine.level;
 
-import engine.level.Level;
-import engine.level.LevelManager;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.ArrayList;

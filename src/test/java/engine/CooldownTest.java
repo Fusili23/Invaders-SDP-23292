@@ -1,7 +1,5 @@
-package com.invaders;
+package engine;
 
-import engine.Clock;
-import engine.Cooldown;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.Random;
@@ -106,4 +104,3 @@ public class CooldownTest {
         assertTrue("Should be finished at the random duration (96ms).", cd.checkFinished());
     }
 }
-

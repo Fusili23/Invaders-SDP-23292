@@ -1,6 +1,5 @@
-package com.invaders;
+package engine;
 
-import engine.GameState;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
