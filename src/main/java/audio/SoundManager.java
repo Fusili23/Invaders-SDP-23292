@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class SoundManager {
+    // Cache holds open clips for reuse, so we suppress the AutoCloseable warning
+    @SuppressWarnings("resource")
     private static final Map<String, Clip> CACHE = new ConcurrentHashMap<>();
     private static volatile boolean muted = false;  // global state of sound
     private static volatile String currentLooping = null;
