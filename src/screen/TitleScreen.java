@@ -357,7 +357,7 @@ public class TitleScreen extends Screen {
 	/**
 	 * Shifts the focus to the next menu item.
 	 */
-	private void nextMenuItem() {
+	void nextMenuItem() {
 		SoundManager.play("sfx/menu_select.wav");
 		if (this.returnCode == 2)
 			this.returnCode = 3;
@@ -378,7 +378,7 @@ public class TitleScreen extends Screen {
 	/**
 	 * Shifts the focus to the previous menu item.
 	 */
-	private void previousMenuItem() {
+	void previousMenuItem() {
 		SoundManager.play("sfx/menu_select.wav");
 		if (this.returnCode == 2)
 			this.returnCode = 0;

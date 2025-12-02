@@ -114,12 +114,40 @@ public class Screen {
 		return this.width;
 	}
 
-	/**
-	 * Getter for screen height.
-	 * 
-	 * @return Screen height.
-	 */
-	public final int getHeight() {
-		return this.height;
+		/**
+
+		 * Getter for screen height.
+
+		 * 
+
+		 * @return Screen height.
+
+		 */
+
+		public final int getHeight() {
+
+			return this.height;
+
+		}
+
+	
+
+		/**
+
+		 * Getter for the screen's return code.
+
+		 *
+
+		 * @return Return code.
+
+		 */
+
+		public final int getReturnCode() {
+
+			return this.returnCode;
+
+		}
+
 	}
-}
+
+	

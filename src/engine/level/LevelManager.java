@@ -51,6 +51,14 @@ public class LevelManager {
     }
     
     /**
+     * Test-only constructor to inject a custom list of levels.
+     * @param levels The list of levels to use.
+     */
+    protected LevelManager(List<Level> levels) {
+        this.levels = levels;
+    }
+
+    /**
      * Gets the settings for a specific level.
      *
      * @param levelNumber The level number to get the settings for.

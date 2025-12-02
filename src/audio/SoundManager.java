@@ -89,4 +89,12 @@ public class SoundManager {
             if (c.isRunning()) c.stop();
         }
     }
+
+    /**
+     * Checks if the sound is globally muted.
+     * @return True if muted, false otherwise.
+     */
+    public static boolean isMuted() {
+        return muted;
+    }
 }

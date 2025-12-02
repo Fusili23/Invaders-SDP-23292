@@ -152,12 +152,7 @@ public class AchievementManager {
                 intermediateUnlocked = true;
             }
         }
-        if (level == 1 && !beginnerUnlocked) {
-            if (unlockAchievement("Beginner")) {
-                unlockedName = "Beginner";
-                beginnerUnlocked = true;
-            }
-        }
+
         if (level == 7 && !conquerorUnlocked) {
             if (unlockAchievement("Conqueror")) {
                 unlockedName = "Conqueror";

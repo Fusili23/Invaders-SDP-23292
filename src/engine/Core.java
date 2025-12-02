@@ -4,6 +4,7 @@ import audio.SoundManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -282,7 +283,7 @@ public final class Core {
 	 * @return A new cooldown.
 	 */
 	public static Cooldown getCooldown(final int milliseconds) {
-		return new Cooldown(milliseconds);
+		return new Cooldown(milliseconds, new SystemClock());
 	}
 
 	/**
@@ -296,6 +297,7 @@ public final class Core {
 	 */
 	public static Cooldown getVariableCooldown(final int milliseconds,
 			final int variance) {
-		return new Cooldown(milliseconds, variance);
+		return new Cooldown(milliseconds, variance, new SystemClock(), new Random());
 	}
 }
+

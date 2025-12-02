@@ -1,89 +1,117 @@
-package test.java.com.invaders;
+package com.invaders;
 
 import engine.GameState;
+import entity.ShopItem;
 import screen.ShopScreen;
 import org.junit.Before;
 import org.junit.Test;
-import java.lang.reflect.Field;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ShopScreenTest {
 
-    private ShopScreen shopScreen;
     private GameState gameState;
+    private ShopScreen shopScreen;
+    private static final int TOTAL_ITEMS_PLUS_EXIT = 6; // 5 items + 1 exit option
 
     @Before
     public void setUp() {
-        gameState = new GameState(1, 0, 3, 0, 0, 100); // 100 coins
+        // Reset the static item states before each test to ensure isolation.
+        ShopItem.resetAllItems();
+        // Create a new game state with 500 coins for each test.
+        gameState = new GameState(1, 0, 3, 0, 0, 500);
         shopScreen = new ShopScreen(gameState, 800, 600, 60, false);
     }
 
-    private void setSelectedItem(int value) throws Exception {
-        Field selectedItemField = ShopScreen.class.getDeclaredField("selectedItem");
-        selectedItemField.setAccessible(true);
-        selectedItemField.set(shopScreen, value);
-    }
-
-    private int getSelectedItem() throws Exception {
-        Field selectedItemField = ShopScreen.class.getDeclaredField("selectedItem");
-        selectedItemField.setAccessible(true);
-        return (int) selectedItemField.get(shopScreen);
-    }
-
-    private void callPrivateMethod(String methodName) throws Exception {
-        java.lang.reflect.Method method = ShopScreen.class.getDeclaredMethod(methodName);
-        method.setAccessible(true);
-        method.invoke(shopScreen);
-    }
-    
-    private void callPrivateMethod(String methodName, Class<?>[] pTypes, Object[] pValues) throws Exception {
-        java.lang.reflect.Method method = ShopScreen.class.getDeclaredMethod(methodName, pTypes);
-        method.setAccessible(true);
-        method.invoke(shopScreen, pValues);
+    @Test
+    public void nextItem_incrementsSelectedItem() {
+        assertEquals(0, shopScreen.getSelectedItem());
+        shopScreen.nextItem();
+        assertEquals(1, shopScreen.getSelectedItem());
     }
 
     @Test
-    public void testNextItem() throws Exception {
-        setSelectedItem(0);
-        callPrivateMethod("nextItem");
-        assertEquals(1, getSelectedItem());
+    public void nextItem_wrapsAroundFromEnd() {
+        // Set selected item to the last option (exit button)
+        for (int i = 0; i < TOTAL_ITEMS_PLUS_EXIT - 1; i++) {
+            shopScreen.nextItem();
+        }
+        assertEquals(TOTAL_ITEMS_PLUS_EXIT - 1, shopScreen.getSelectedItem());
 
-        // Test wrapping around
-        setSelectedItem(5); // TOTAL_ITEMS is 5 (0-4 items + exit)
-        callPrivateMethod("nextItem");
-        assertEquals(0, getSelectedItem());
+        shopScreen.nextItem();
+        assertEquals(0, shopScreen.getSelectedItem()); // Should wrap around to the first item
     }
 
     @Test
-    public void testPreviousItem() throws Exception {
-        setSelectedItem(1);
-        callPrivateMethod("previousItem");
-        assertEquals(0, getSelectedItem());
-        
-        // Test wrapping around
-        setSelectedItem(0);
-        callPrivateMethod("previousItem");
-        assertEquals(5, getSelectedItem()); // TOTAL_ITEMS
+    public void previousItem_decrementsSelectedItem() {
+        shopScreen.nextItem(); // selected is now 1
+        assertEquals(1, shopScreen.getSelectedItem());
+
+        shopScreen.previousItem();
+        assertEquals(0, shopScreen.getSelectedItem());
     }
 
     @Test
-    public void testPurchaseItem_NotEnoughCoins() throws Exception {
-        // MultiShot level 1 costs 30. Player has 100. Should be able to afford.
-        // Let's try to buy something expensive. Penetration level 2 costs 80.
-        gameState.setCoins(70);
-        
-        Class<?>[] pTypes = {int.class, int.class};
-        Object[] pValues = {2, 2}; // itemIndex 2 (Penetration), level 2
+    public void previousItem_wrapsAroundFromStart() {
+        assertEquals(0, shopScreen.getSelectedItem());
+        shopScreen.previousItem();
+        assertEquals(TOTAL_ITEMS_PLUS_EXIT - 1, shopScreen.getSelectedItem()); // Should wrap around to the last item
+    }
 
-        callPrivateMethod("purchaseItem", pTypes, pValues);
+    @Test
+    public void purchaseItem_successfulPurchase_deductsCoinsAndUpgradesItem() {
+        // MultiShot Level 1 costs 30 coins. Player has 500.
+        int itemIndex = 0; // MultiShot
+        int levelToPurchase = 1;
+        int initialCoins = gameState.getCoin();
+        int price = 30;
 
-        // Coins should not be deducted.
-        assertEquals(70, gameState.getCoin());
-        
-        // Check feedback message
-        Field feedbackMessageField = ShopScreen.class.getDeclaredField("feedbackMessage");
-        feedbackMessageField.setAccessible(true);
-        String feedbackMessage = (String) feedbackMessageField.get(shopScreen);
-        assertEquals("Not enough coins!", feedbackMessage);
+        shopScreen.purchaseItem(itemIndex, levelToPurchase);
+
+        assertEquals("Coins should be deducted.", initialCoins - price, gameState.getCoin());
+        assertEquals("Item level should be upgraded.", levelToPurchase, ShopItem.getMultiShotLevel());
+        assertTrue("Feedback message should indicate success.", shopScreen.getFeedbackMessage().contains("Purchased"));
+    }
+
+    @Test
+    public void purchaseItem_insufficientFunds_doesNotPurchaseAndShowsMessage() {
+        gameState.setCoins(20); // Not enough for a 30 coin item.
+        int itemIndex = 0; // MultiShot
+        int levelToPurchase = 1;
+
+        shopScreen.purchaseItem(itemIndex, levelToPurchase);
+
+        assertEquals("Coins should not be deducted.", 20, gameState.getCoin());
+        assertEquals("Item level should not change.", 0, ShopItem.getMultiShotLevel());
+        assertEquals("Feedback message should indicate not enough coins.", "Not enough coins!", shopScreen.getFeedbackMessage());
+    }
+
+    @Test
+    public void purchaseItem_itemAlreadyOwned_doesNotPurchaseAndShowsMessage() {
+        ShopItem.setMultiShotLevel(1); // Item is already level 1.
+        int initialCoins = gameState.getCoin();
+        int itemIndex = 0; // MultiShot
+        int levelToPurchase = 1; // Attempting to buy level 1 again.
+
+        shopScreen.purchaseItem(itemIndex, levelToPurchase);
+
+        assertEquals("Coins should not be deducted.", initialCoins, gameState.getCoin());
+        assertEquals("Item level should not change.", 1, ShopItem.getMultiShotLevel());
+        assertEquals("Feedback message should indicate item is already owned.", "Already owned!", shopScreen.getFeedbackMessage());
+    }
+
+    @Test
+    public void purchaseItem_higherLevel_successfulPurchase() {
+        ShopItem.setMultiShotLevel(1);
+        gameState.setCoins(100);
+        int initialCoins = gameState.getCoin();
+        int price = 60; // Price for level 2
+
+        shopScreen.purchaseItem(0, 2); // Purchase MultiShot Level 2
+
+        assertEquals("Coins should be deducted for the new level.", initialCoins - price, gameState.getCoin());
+        assertEquals("Item should be upgraded to the new level.", 2, ShopItem.getMultiShotLevel());
+        assertTrue("Feedback message should indicate success.", shopScreen.getFeedbackMessage().contains("Purchased"));
     }
 }

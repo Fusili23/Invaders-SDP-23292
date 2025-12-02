@@ -225,7 +225,7 @@ public class ShopScreen extends Screen {
     /**
      * Shifts focus to next item.
      */
-    private void nextItem() {
+    void nextItem() {
         if (this.selectedItem >= TOTAL_ITEMS) {
             this.selectedItem = 0;
         } else {
@@ -236,7 +236,7 @@ public class ShopScreen extends Screen {
     /**
      * Shifts focus to previous item.
      */
-    private void previousItem() {
+    void previousItem() {
         if (this.selectedItem <= 0) {
             this.selectedItem = TOTAL_ITEMS;
         } else {
@@ -250,7 +250,7 @@ public class ShopScreen extends Screen {
      * @param itemIndex Index of the item.
      * @param level Level to purchase.
      */
-    private void purchaseItem(final int itemIndex, final int level) {
+    void purchaseItem(final int itemIndex, final int level) {
         int currentLevel = getCurrentLevel(itemIndex);
         int price = ITEM_PRICES[itemIndex][level - 1];
 
@@ -371,4 +371,9 @@ public class ShopScreen extends Screen {
     public int getItemCurrentLevel(final int itemIndex) {
         return getCurrentLevel(itemIndex);
     }
+
+    // getters for testing
+    public int getSelectedItem() { return this.selectedItem;}
+    public int getSelectionMode() { return this.selectionMode; }
+    public String getFeedbackMessage() { return this.feedbackMessage; }
 }
