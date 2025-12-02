@@ -4,7 +4,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JsonLoaderTest {
 
@@ -78,7 +80,7 @@ public class JsonLoaderTest {
 
     @Test(expected = IOException.class)
     public void parse_malformedJson_throwsIOException() throws IOException {
-        String jsonContent = "{\"levels\": [{\"level\": 1, }]} "; // Malformed JSON with trailing comma
+        String jsonContent = "{\"levels\": [{\"level\": 1, }]}"; // Malformed JSON with trailing comma
         JsonLoader.parse(jsonContent);
     }
 
