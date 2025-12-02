@@ -1,0 +1,15 @@
+engine\AchievementManagerTest.class
+engine\level\JsonLoaderTest.class
+engine\AchievementTest.class
+screen\TitleScreenTest.class
+engine\level\LevelManagerTest.class
+screen\ShopScreenTest.class
+engine\level\MockLevelManager.class
+engine\GameStateTest.class
+engine\ScoreTest.class
+audio\SoundManagerTest.class
+engine\CooldownTest$MockClock.class
+engine\GameSettingsTest.class
+engine\CoinTest.class
+screen\TitleScreenTest$TestableTitleScreen.class
+engine\CooldownTest.class
