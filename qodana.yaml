@@ -23,7 +23,7 @@ profile:
 #    paths:
 #      - <path/where/not/run/inspection>
 
-projectJDK: "21" #(Applied in CI/CD pipeline)
+projectJDK: "11" #(Applied in CI/CD pipeline) - Matches development environment
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
 #bootstrap: sh ./prepare-qodana.sh
