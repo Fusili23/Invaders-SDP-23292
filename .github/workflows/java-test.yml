@@ -35,6 +35,11 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: Fusili23/Invaders-SDP-23292
+        files: ./target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false  # Don't block CI if Codecov fails
+        verbose: true  # Enable verbose logging for debugging
 
     - name: Upload test results to Codecov
       if: ${{ !cancelled() && matrix.java == 11 }}
@@ -42,3 +47,19 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: target/surefire-reports/TEST-*.xml
+
+    # Send notification to Discord (more reliable than Codecov webhook)
+    - name: Notify Discord
+      if: matrix.java == 11 && always()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        status: ${{ job.status }}
+        title: "Coverage Report"
+        description: |
+          Build: ${{ job.status }}
+          Coverage reports uploaded to Codecov
+          View: https://codecov.io/gh/Fusili23/Invaders-SDP-23292
+        color: 0x0099ff
+        username: GitHub Actions
+

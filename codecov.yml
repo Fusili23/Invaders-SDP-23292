@@ -1,19 +1,27 @@
 codecov:
+  require_ci_to_pass: true
+  
   notify:
-    slack:
+    # For Discord notifications, use GitHub Actions instead (see workflow file)
+    # Codecov's webhook system has limited Discord support
+    webhook:
       default:
-        # [중요] 기존 웹후크 주소가 노출되었으니, 디스코드에서 꼭! 새로 발급받아 교체하세요.
-        url: "https://discordapp.com/api/webhooks/1442473342350131201/p8xIERb0zaaDpVk1cykZCnHWdvjtaOdHxuk3qzpnFDL8rKg2_CxJtq0R4Ok32L1KTQYg/slack"
-        attachments: "sunburst, diff"
-        on:
-          - success
-          - failure
-          - error
+        url: "https://discordapp.com/api/webhooks/1442473342350131201/p8xIERb0zaaDpVk1cykZCnHWdvjtaOdHxuk3qzpnFDL8rKg2_CxJtq0R4Ok32L1KTQYg"
+        only_pulls: false
 
-# ▼ [추가된 부분] 커버리지 점수가 떨어져도 PR을 막지 않게 하는 설정
+# Coverage thresholds - don't fail PR if coverage decreases slightly
 coverage:
   status:
     project:
       default:
         target: auto
-        threshold: 20%    # 커버리지가 20%까지 떨어져도 '성공(Pass)'으로 처리합니다.
+        threshold: 20%  # Allow up to 20% coverage decrease
+    patch:
+      default:
+        target: 70%  # New code should have 70% coverage
+        threshold: 10%
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
