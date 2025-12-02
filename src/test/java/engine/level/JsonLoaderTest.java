@@ -80,7 +80,8 @@ public class JsonLoaderTest {
 
     @Test(expected = IOException.class)
     public void parse_malformedJson_throwsIOException() throws IOException {
-        String jsonContent = "{\"levels\": [{\"level\": 1, }]}"; // Malformed JSON with trailing comma
+        // Malformed JSON with a trailing comma in an object
+        String jsonContent = "{\"levels\": [{\"level\": 1, }]}";
         JsonLoader.parse(jsonContent);
     }
 
