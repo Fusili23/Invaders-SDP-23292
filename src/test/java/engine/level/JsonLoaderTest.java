@@ -1,12 +1,12 @@
-package com.invaders;
+package engine.level;
 
-import engine.level.JsonLoader;
-import engine.level.Level;
-import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JsonLoaderTest {
 
@@ -67,7 +67,8 @@ public class JsonLoaderTest {
 
     @Test(expected = IOException.class)
     public void parse_malformedJson_throwsIOException() throws IOException {
-        String jsonContent = "{\"levels\": [{\"level\": 1, }]\n"; // Malformed JSON with trailing comma
+        // Malformed JSON with a trailing comma in an object
+        String jsonContent = "{\"levels\": [{\"level\": 1, }]}";
         JsonLoader.parse(jsonContent);
     }
 

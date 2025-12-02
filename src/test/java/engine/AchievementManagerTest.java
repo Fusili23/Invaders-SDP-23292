@@ -1,6 +1,5 @@
-package com.invaders;
+package engine;
 
-import engine.AchievementManager;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
@@ -92,14 +91,18 @@ public class AchievementManagerTest {
 
     @Test
     public void onEnemyDefeated_accuracyBelowThreshold_unlocksBadSniper() {
-        // 6 shots, 1 hit (16.6% accuracy, <= 80%)
-        achievementManager.onEnemyDefeated(); // Unlocks "First Blood", we can ignore it.
-        
-        for (int i = 0; i < 5; i++) {
+        // Simulate firing 6 shots before the first hit.
+        for (int i = 0; i < 6; i++) {
             achievementManager.onShotFired();
         }
+        // shotsFired is now 6.
+
+        // Simulate the first enemy being hit.
+        // This increments shotsHit to 1. Accuracy is 1/6 = 16.7%.
+        // The check for "Bad Sniper" should pass (6 > 5 and 16.7% <= 80%).
+        // The "Bad Sniper" name should be returned, overwriting "First Blood".
         String unlockedName = achievementManager.onEnemyDefeated();
-        
+
         assertEquals("'Bad Sniper' should unlock when accuracy is low.", "Bad Sniper", unlockedName);
     }
 

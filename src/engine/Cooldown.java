@@ -65,7 +65,7 @@ public class Cooldown {
 	 */
 	public final boolean checkFinished() {
 		if ((this.time == 0)
-				|| this.time + this.duration < this.clock.now())
+				|| this.time + this.duration <= this.clock.now())
 			return true;
 		return false;
 	}

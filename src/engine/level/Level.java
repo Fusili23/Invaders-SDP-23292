@@ -56,6 +56,20 @@ public class Level {
         this.specialGimmick = (String) map.get("specialGimmick");
         this.unlockCondition = (String) map.get("unlockCondition");
 
+        // Direct parsing for simple/flat test data
+        if (map.containsKey("formationWidth")) {
+            this.formationWidth = ((Number) map.get("formationWidth")).intValue();
+        }
+        if (map.containsKey("formationHeight")) {
+            this.formationHeight = ((Number) map.get("formationHeight")).intValue();
+        }
+        if (map.containsKey("baseSpeed")) {
+            this.baseSpeed = ((Number) map.get("baseSpeed")).intValue();
+        }
+        if (map.containsKey("shootingFrecuency")) {
+            this.shootingFrecuency = ((Number) map.get("shootingFrecuency")).intValue();
+        }
+
         // Parsing nested objects and lists (previously in Wave)
         if (map.get("enemyFormation") != null) {
             this.enemyFormation = new LevelEnemyFormation((Map<String, Object>) map.get("enemyFormation"));
