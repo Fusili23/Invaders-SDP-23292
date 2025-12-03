@@ -288,9 +288,9 @@ public class TitleScreen extends Screen {
 						case 3: // Toggle Music
 							this.soundButton.changeSoundState();
 							if (SoundButton.getIsSoundOn()) {
-								SoundManager.uncutAllSound();
+								SoundManager.unmuteAll();
 							} else {
-								SoundManager.cutAllSound();
+								SoundManager.muteAll();
 							}
 							this.selectionCooldown.reset();
 							break;
@@ -325,9 +325,9 @@ public class TitleScreen extends Screen {
 						this.soundButton.changeSoundState();
 
 						if (SoundButton.getIsSoundOn()) {
-							SoundManager.uncutAllSound();
+							SoundManager.unmuteAll();
 						} else {
-							SoundManager.cutAllSound();
+							SoundManager.muteAll();
 						}
 
 						if (this.soundButton.isTeamCreditScreenPossible()) {

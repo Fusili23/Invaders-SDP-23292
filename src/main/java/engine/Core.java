@@ -170,6 +170,15 @@ public final class Core {
 					LOGGER.info("Starting " + currentScreen.getClass().getSimpleName() + " screen.");
 					returnCode = frame.setScreen(currentScreen);
 					break;
+                case 9:
+                    // 메뉴창에서 메인 메뉴 재진입시 사운드 초기화 방지용
+                    currentScreen = new TitleScreen(width, height, FPS);
+                    //SoundManager.stopAll();
+                    //SoundManager.playLoop("sfx/menu_music.wav");
+                    LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
+                            + " title screen at " + FPS + " fps.");
+                    returnCode = frame.setScreen(currentScreen);
+                    LOGGER.info("Closing title screen.");
                 default:
                     break;
             }

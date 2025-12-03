@@ -52,6 +52,7 @@ public class SoundManager {
             stopAll();
             c.setFramePosition(0);
             c.loop(Clip.LOOP_CONTINUOUSLY);
+            ((FloatControl)c.getControl(FloatControl.Type.MASTER_GAIN)).setValue(0.0f);
             c.start();
             currentLooping = resourcePath;  // useful for unmute
         } catch (Exception e) {
@@ -84,6 +85,24 @@ public class SoundManager {
         } catch (Exception e) {
             System.err.println("[Sound] Stop failed: " + resourcePath + " -> " + e.getMessage());
         }
+    }
+
+    public static void muteAll() {
+        muted = true;
+        for (Clip c : CACHE.values()) {
+            if (c.isRunning()) ((FloatControl)c.getControl(FloatControl.Type.MASTER_GAIN)).setValue(-80.0f);
+        }
+    }
+
+    public static void unmuteAll() {
+        muted = false;
+        for (Clip c : CACHE.values()) {
+            if (c.isRunning()) {
+                ((FloatControl)c.getControl(FloatControl.Type.MASTER_GAIN)).setValue(0f);
+                return;
+            }
+        }
+        playLoop(currentLooping);
     }
 
     public static void stopAll() {

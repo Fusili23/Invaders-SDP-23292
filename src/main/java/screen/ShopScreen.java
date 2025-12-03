@@ -104,7 +104,7 @@ public class ShopScreen extends Screen {
         this.betweenLevels = betweenLevels;
 
         // If opened between levels : back to game, otherwise : back to menu
-        this.returnCode = betweenLevels ? 2 : 1;
+        this.returnCode = betweenLevels ? 2 : 9;
 
         this.selectionCooldown = Core.getCooldown(SELECTION_TIME);
         this.selectionCooldown.reset();
