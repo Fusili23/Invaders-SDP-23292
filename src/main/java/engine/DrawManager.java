@@ -530,7 +530,7 @@ public final class DrawManager {
 
 			drawCenteredRegularString(screen,
 					achievement.getName() + " - " + achievement.getDescription(),
-					screen.getHeight() / 6 + fontRegularMetrics.getHeight() * (count + 1) * 2);
+					screen.getHeight() / 7 + fontRegularMetrics.getHeight() * (count + 1) * 2);
 
 			count++;
 		}
