@@ -25,7 +25,7 @@ public class AchievementScreen extends Screen {
 
     public AchievementScreen(int width, int height, int fps) {
         super(width, height, fps);
-        this.returnCode = 1; // Default return code
+        this.returnCode = 9; // Default return code
 
     }
 
