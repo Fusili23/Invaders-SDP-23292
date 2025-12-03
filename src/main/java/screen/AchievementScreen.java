@@ -19,9 +19,14 @@ public class AchievementScreen extends Screen {
      * @param height Screen height.
      * @param fps    Frames per second.
      */
+    /** current page number (0: single achievement page, 1: 2p achievement page) */
+    private int currentPage = 0;
+
+
     public AchievementScreen(int width, int height, int fps) {
         super(width, height, fps);
         this.returnCode = 1; // Default return code
+
     }
 
     /**
@@ -30,6 +35,7 @@ public class AchievementScreen extends Screen {
     @Override
     public void initialize() {
         super.initialize();
+        this.currentPage = 0;
     }
 
     /**
@@ -53,6 +59,12 @@ public class AchievementScreen extends Screen {
         if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
             this.isRunning = false;
         }
+        if (inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {
+            this.currentPage = 1;
+        }
+        if (inputManager.isKeyDown(KeyEvent.VK_LEFT)) {
+            this.currentPage = 0;
+        }
     }
 
     /**
@@ -60,8 +72,7 @@ public class AchievementScreen extends Screen {
      */
     private void draw() {
         drawManager.initDrawing(this);
-        List<Achievement> achievements = AchievementManager.getInstance().getAchievements();
-        drawManager.drawAchievements(this, achievements);
+        drawManager.drawAchievements(this, this.currentPage);
         drawManager.completeDrawing(this);
     }
 }

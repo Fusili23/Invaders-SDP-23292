@@ -491,19 +491,49 @@ public final class DrawManager {
 		}
     }
 
-    public void drawAchievements(final Screen screen, final List<Achievement> achievements) {
+    public void drawAchievements(final Screen screen, final int pageIndex) {
+		List<Achievement> allAchievements = AchievementManager.getInstance().getAchievements();
+
+		String title;
+		int startIndex;
+		int endIndex;
+		if (pageIndex == 0) {
+			title = "SINGLE PLAYER ACHIEVEMENTS";
+			startIndex = 0;
+			endIndex = 8;
+			if (endIndex > allAchievements.size()) endIndex = allAchievements.size();
+
+			// next page announcement
+			backBufferGraphics.setColor(Color.WHITE);
+			drawCenteredRegularString(screen, "Press Right -> for Co-op", screen.getHeight() - 80);
+		} else {
+			title = "CO-OP ACHIEVEMENTS";
+			startIndex = 8;
+			endIndex = allAchievements.size();
+
+			// previous page announcement
+			backBufferGraphics.setColor(Color.WHITE);
+			drawCenteredRegularString(screen, "<- Press Left for Single", screen.getHeight() - 80);
+		}
         backBufferGraphics.setColor(Color.GREEN);
         drawCenteredBigString(screen, "Achievements", screen.getHeight() / 8);
-        int i = 0;
-        for (Achievement achievement : achievements) {
-            if (achievement.isUnlocked()) {
-                backBufferGraphics.setColor(Color.GREEN);
-            } else {
-                backBufferGraphics.setColor(Color.WHITE);
-            }
-            drawCenteredRegularString(screen, achievement.getName() + " - " + achievement.getDescription(), screen.getHeight() / 5 + fontRegularMetrics.getHeight() * (i + 1) * 2);
-            i++;
-        }
+        int count = 0;
+		for (int i = startIndex; i < endIndex; i++) {
+			Achievement achievement = allAchievements.get(i);
+
+			if (achievement.isUnlocked()) {
+				backBufferGraphics.setColor(Color.GREEN);
+			} else {
+				backBufferGraphics.setColor(Color.WHITE);
+			}
+
+
+			drawCenteredRegularString(screen,
+					achievement.getName() + " - " + achievement.getDescription(),
+					screen.getHeight() / 7 + fontRegularMetrics.getHeight() * (count + 1) * 2);
+
+			count++;
+		}
         backBufferGraphics.setColor(Color.GRAY);
         drawCenteredRegularString(screen, "Press ESC to return", screen.getHeight() - 50);
     }
