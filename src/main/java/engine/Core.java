@@ -278,7 +278,7 @@ public final class Core {
 	/**
 	 * Controls access to the file manager.
 	 * 
-	 * @return Application file manager.
+	 * @return Application file manager.출력을 변환해 보세요
 	 */
 	public static FileManager getFileManager() {
 		return FileManager.getInstance();
