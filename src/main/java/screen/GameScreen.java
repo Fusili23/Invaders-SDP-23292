@@ -791,6 +791,8 @@ public class GameScreen extends Screen {
     public void showAchievement(String message) {
         this.achievementText = message;
         this.achievementPopupCooldown.reset();
+		SoundManager.stop("sfx/achievement.wav");
+		SoundManager.play("sfx/achievement.wav");
     }
 
     /**
