@@ -160,11 +160,11 @@ public final class Core {
 					break;
                 case 9:
                     // 메뉴창에서 메인 메뉴 재진입시 사운드 초기화 방지용
-                    currentScreen = new TitleScreen(width, height, FPS);
+                    currentScreen = new TitleScreen(width, height, GameConfig.FPS);
                     //SoundManager.stopAll();
                     //SoundManager.playLoop("sfx/menu_music.wav");
-                    LOGGER.info("Starting " + WIDTH + "x" + HEIGHT
-                            + " title screen at " + FPS + " fps.");
+                    LOGGER.info("Starting " + GameConfig.WIDTH + "x" + GameConfig.HEIGHT
+                            + " title screen at " + GameConfig.FPS + " fps.");
                     returnCode = frame.setScreen(currentScreen);
                     LOGGER.info("Closing title screen.");
                 default:
