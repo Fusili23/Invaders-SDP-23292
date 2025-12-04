@@ -65,7 +65,7 @@ public class HighScoreScreen extends Screen {
 
 		draw();
 		if (this.inputDelay.checkFinished()) {
-			if (inputManager.isKeyDown(KeyEvent.VK_SPACE)) {
+			if (inputManager.isKeyDown(KeyEvent.VK_ESCAPE)) {
 				this.isRunning = false;
 			}
 			if (inputManager.isKeyDown(KeyEvent.VK_LEFT) || inputManager.isKeyDown(KeyEvent.VK_RIGHT)) {

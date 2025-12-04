@@ -465,7 +465,7 @@ public final class DrawManager {
 	 */
 	public void drawHighScoreMenu(final Screen screen, final boolean isTwoPlayer) {
 		String highScoreString = "High Scores " + (isTwoPlayer ? "(2P)" : "(1P)");
-		String instructionsString = "Press Space to return";
+		String instructionsString = "Press ESC to return";
 		String toggleString = "Press Left/Right to toggle";
 
 		backBufferGraphics.setColor(Color.GREEN);
