@@ -8,12 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import engine.Cooldown;
-import engine.Core;
-import engine.GameState;
-import engine.GameTimer;
-import engine.AchievementManager;
-import engine.ItemHUDManager;
+import engine.*;
 import entity.*;
 import audio.SoundManager;
 import java.awt.event.KeyEvent;
@@ -31,27 +26,11 @@ import engine.level.LevelManager;
  */
 public class GameScreen extends Screen {
 
-	/** Milliseconds until the screen accepts user input. */
-	private static final int INPUT_DELAY = 6000;
-	/** Bonus score for each life remaining at the end of the level. */
-	private static final int LIFE_SCORE = 100;
-	/** Minimum time between bonus ship's appearances. */
-	private static final int BONUS_SHIP_INTERVAL = 20000;
-	/** Maximum variance in the time between bonus ship's appearances. */
-	private static final int BONUS_SHIP_VARIANCE = 10000;
-	/** Time until bonus ship explosion disappears. */
-	private static final int BONUS_SHIP_EXPLOSION = 500;
-	/** Time until bonus ship explosion disappears. */
-	private static final int BOSS_EXPLOSION = 600;
-	/** Time from finishing the level to screen change. */
-	private static final int SCREEN_CHANGE_INTERVAL = 1500;
-	/** Height of the interface separation line. */
-	private static final int SEPARATION_LINE_HEIGHT = 45;
-	/** Height of the items separation line (above items). */
-	private static final int ITEMS_SEPARATION_LINE_HEIGHT = 400;
-    /** Returns the Y-coordinate of the bottom boundary for enemies (above items HUD) */
+    /**
+     * Returns the Y-coordinate of the bottom boundary for enemies (above items HUD)
+     */
     public static int getItemsSeparationLineHeight() {
-        return ITEMS_SEPARATION_LINE_HEIGHT;
+        return GameConfig.ITEMS_SEPARATION_LINE_HEIGHT;
     }
 
     /** Current level data (direct from Level system). */
@@ -189,26 +168,26 @@ public class GameScreen extends Screen {
 		enemyShipFormation.attach(this);
         this.enemyShipFormation.applyEnemyColorByLevel(this.currentLevel);
 		if (this.isTwoPlayer) {
-			this.ship = new Ship(this.width / 3, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
+			this.ship = new Ship(this.width / 3, GameConfig.ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
 			this.ship.setPlayerId(1);
-			this.ship2 = new Ship(this.width * 2 / 3, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.CYAN);
+			this.ship2 = new Ship(this.width * 2 / 3, GameConfig.ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.CYAN);
 			this.ship2.setPlayerId(2);
 		} else {
-			this.ship = new Ship(this.width / 2, ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
+			this.ship = new Ship(this.width / 2, GameConfig.ITEMS_SEPARATION_LINE_HEIGHT - 20, Color.GREEN);
 		}
 
         // special enemy initial
 		enemyShipSpecialFormation = new EnemyShipSpecialFormation(this.currentLevel,
-				Core.getVariableCooldown(BONUS_SHIP_INTERVAL, BONUS_SHIP_VARIANCE),
-				Core.getCooldown(BONUS_SHIP_EXPLOSION));
+				Core.getVariableCooldown(GameConfig.BONUS_SHIP_INTERVAL, GameConfig.BONUS_SHIP_VARIANCE),
+				Core.getCooldown(GameConfig.BONUS_SHIP_EXPLOSION));
 		enemyShipSpecialFormation.attach(this);
-		this.bossExplosionCooldown = Core.getCooldown(BOSS_EXPLOSION);
-		this.screenFinishedCooldown = Core.getCooldown(SCREEN_CHANGE_INTERVAL);
+		this.bossExplosionCooldown = Core.getCooldown(GameConfig.BOSS_EXPLOSION);
+		this.screenFinishedCooldown = Core.getCooldown(GameConfig.SCREEN_CHANGE_INTERVAL);
 		this.bullets = new HashSet<Bullet>();
         this.dropItems = new HashSet<DropItem>();
 
 		this.gameStartTime = System.currentTimeMillis();
-		this.inputDelay = Core.getCooldown(INPUT_DELAY);
+		this.inputDelay = Core.getCooldown(GameConfig.INPUT_DELAY);
 		this.inputDelay.reset();
 
 		this.gameTimer = new GameTimer();
@@ -226,7 +205,7 @@ public class GameScreen extends Screen {
 	public final int run() {
 		super.run();
 
-		this.score += LIFE_SCORE * (this.lives - 1);
+		this.score += GameConfig.LIFE_SCORE * (this.lives - 1);
 		this.logger.info("Screen cleared with a score of " + this.score);
 
 		return this.returnCode;
@@ -244,56 +223,10 @@ public class GameScreen extends Screen {
 				this.gameTimer.start();
 			}
 
-			// Player 1 controls
-			if (!this.ship.isPermanentlyDestroyed() && !this.ship.isDestroyed()) {
-				boolean right = inputManager.isKeyDown(KeyEvent.VK_D);
-				boolean left  = inputManager.isKeyDown(KeyEvent.VK_A);
-				boolean up    = inputManager.isKeyDown(KeyEvent.VK_W);
-				boolean down  = inputManager.isKeyDown(KeyEvent.VK_S);
-				boolean fire  = inputManager.isKeyDown(KeyEvent.VK_SPACE);
-
-				boolean isRightBorder = this.ship.getPositionX()
-						+ this.ship.getWidth() + this.ship.getSpeed() > this.width - 1;
-				boolean isLeftBorder = this.ship.getPositionX() - this.ship.getSpeed() < 1;
-				boolean isUpBorder = this.ship.getPositionY() - this.ship.getSpeed() < SEPARATION_LINE_HEIGHT;
-				boolean isDownBorder = this.ship.getPositionY()
-						+ this.ship.getHeight() + this.ship.getSpeed() > ITEMS_SEPARATION_LINE_HEIGHT;
-
-				if (right && !isRightBorder) this.ship.moveRight();
-				if (left  && !isLeftBorder)  this.ship.moveLeft();
-				if (up    && !isUpBorder)    this.ship.moveUp();
-				if (down  && !isDownBorder)  this.ship.moveDown();
-
-				if (fire && this.ship.shoot(this.bullets)) {
-					this.bulletsShot++;
-					AchievementManager.getInstance().onShotFired();
-				}
-			}
-
-			// Player 2 controls
-			if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && !this.ship2.isDestroyed()) {
-				boolean right = inputManager.isKeyDown(KeyEvent.VK_RIGHT);
-				boolean left  = inputManager.isKeyDown(KeyEvent.VK_LEFT);
-				boolean up    = inputManager.isKeyDown(KeyEvent.VK_UP);
-				boolean down  = inputManager.isKeyDown(KeyEvent.VK_DOWN);
-				boolean fire  = inputManager.isKeyDown(KeyEvent.VK_ENTER);
-
-				boolean isRightBorder = this.ship2.getPositionX()
-						+ this.ship2.getWidth() + this.ship2.getSpeed() > this.width - 1;
-				boolean isLeftBorder = this.ship2.getPositionX() - this.ship2.getSpeed() < 1;
-				boolean isUpBorder = this.ship2.getPositionY() - this.ship2.getSpeed() < SEPARATION_LINE_HEIGHT;
-				boolean isDownBorder = this.ship2.getPositionY()
-						+ this.ship2.getHeight() + this.ship2.getSpeed() > ITEMS_SEPARATION_LINE_HEIGHT;
-
-				if (right && !isRightBorder) this.ship2.moveRight();
-				if (left  && !isLeftBorder)  this.ship2.moveLeft();
-				if (up    && !isUpBorder)    this.ship2.moveUp();
-				if (down  && !isDownBorder)  this.ship2.moveDown();
-
-				if (fire && this.ship2.shoot(this.bullets)) {
-					this.bulletsShot++; // Shared for now
-					AchievementManager.getInstance().onShotFired();
-				}
+			// Player controls
+			handlePlayerInput(this.ship, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_SPACE);
+			if (this.isTwoPlayer) {
+				handlePlayerInput(this.ship2, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_ENTER);
 			}
 
 
@@ -452,8 +385,8 @@ public class GameScreen extends Screen {
 		drawManager.drawTime(this, this.elapsedTime);
 		drawManager.drawItemsHUD(this);
 		drawManager.drawLevel(this, this.currentLevel.getLevelName());
-		drawManager.drawHorizontalLine(this, SEPARATION_LINE_HEIGHT - 1);
-		drawManager.drawHorizontalLine(this, ITEMS_SEPARATION_LINE_HEIGHT);
+		drawManager.drawHorizontalLine(this, GameConfig.SEPARATION_LINE_HEIGHT - 1);
+		drawManager.drawHorizontalLine(this, GameConfig.ITEMS_SEPARATION_LINE_HEIGHT);
 
 		if (this.achievementText != null && !this.achievementPopupCooldown.checkFinished()) {
 			drawManager.drawAchievementPopup(this, this.achievementText);
@@ -470,7 +403,7 @@ public class GameScreen extends Screen {
 
 		// Countdown to game start.
 		if (!this.inputDelay.checkFinished()) {
-			int countdown = (int) ((INPUT_DELAY
+			int countdown = (int) ((GameConfig.INPUT_DELAY
 					- (System.currentTimeMillis()
 					- this.gameStartTime)) / 1000);
 			drawManager.drawCountDown(this, this.gameState.getLevel(), countdown,
@@ -492,7 +425,7 @@ public class GameScreen extends Screen {
 		Set<Bullet> recyclable = new HashSet<Bullet>();
 		for (Bullet bullet : this.bullets) {
 			bullet.update();
-			if (bullet.getPositionY() < SEPARATION_LINE_HEIGHT
+			if (bullet.getPositionY() < GameConfig.SEPARATION_LINE_HEIGHT
 					|| bullet.getPositionY() > this.height)
 				recyclable.add(bullet);
 		}
@@ -508,7 +441,7 @@ public class GameScreen extends Screen {
         Set<DropItem> recyclable = new HashSet<DropItem>();
         for (DropItem dropItem : this.dropItems) {
             dropItem.update();
-            if (dropItem.getPositionY() < SEPARATION_LINE_HEIGHT
+            if (dropItem.getPositionY() < GameConfig.SEPARATION_LINE_HEIGHT
                     || dropItem.getPositionY() > this.height)
                 recyclable.add(dropItem);
         }
@@ -957,7 +890,7 @@ public class GameScreen extends Screen {
 				break;
 			case "omegaBoss":
 			case "omegaAndFinal":
-				this.omegaBoss = new OmegaBoss(Color.ORANGE, ITEMS_SEPARATION_LINE_HEIGHT);
+				this.omegaBoss = new OmegaBoss(Color.ORANGE, GameConfig.ITEMS_SEPARATION_LINE_HEIGHT);
 				omegaBoss.attach(this);
 				this.logger.info("Omega Boss has spawned!");
 				break;
@@ -1028,6 +961,43 @@ public class GameScreen extends Screen {
 		if (this.finalBoss != null && this.finalBoss.isDestroyed()) {
 			this.levelFinished = true;
 			this.screenFinishedCooldown.reset();
+		}
+	}
+
+	/**
+	 * Handles the input for a player's ship.
+	 *
+	 * @param playerShip The ship to control.
+	 * @param upKey The key for moving up.
+	 * @param downKey The key for moving down.
+	 * @param leftKey The key for moving left.
+	 * @param rightKey The key for moving right.
+	 * @param fireKey The key for firing.
+	 */
+	private void handlePlayerInput(final Ship playerShip, final int upKey, final int downKey, final int leftKey, final int rightKey, final int fireKey) {
+		if (!playerShip.isPermanentlyDestroyed() && !playerShip.isDestroyed()) {
+			boolean right = inputManager.isKeyDown(rightKey);
+			boolean left  = inputManager.isKeyDown(leftKey);
+			boolean up    = inputManager.isKeyDown(upKey);
+			boolean down  = inputManager.isKeyDown(downKey);
+			boolean fire  = inputManager.isKeyDown(fireKey);
+
+			boolean isRightBorder = playerShip.getPositionX()
+					+ playerShip.getWidth() + playerShip.getSpeed() > this.width - 1;
+			boolean isLeftBorder = playerShip.getPositionX() - playerShip.getSpeed() < 1;
+			boolean isUpBorder = playerShip.getPositionY() - playerShip.getSpeed() < GameConfig.SEPARATION_LINE_HEIGHT;
+			boolean isDownBorder = playerShip.getPositionY()
+					+ playerShip.getHeight() + playerShip.getSpeed() > GameConfig.ITEMS_SEPARATION_LINE_HEIGHT;
+
+			if (right && !isRightBorder) playerShip.moveRight();
+			if (left  && !isLeftBorder)  playerShip.moveLeft();
+			if (up    && !isUpBorder)    playerShip.moveUp();
+			if (down  && !isDownBorder)  playerShip.moveDown();
+
+			if (fire && playerShip.shoot(this.bullets)) {
+				this.bulletsShot++;
+				AchievementManager.getInstance().onShotFired();
+			}
 		}
 	}
 }
