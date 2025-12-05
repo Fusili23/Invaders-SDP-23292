@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -18,10 +14,16 @@ pipeline {
             }
         }
 
-        stage('Test Reports') {
+        stage('Report') {
             steps {
-                junit 'target/surefire-reports/*.xml'
+                junit 'build/test-results/test/*.xml'
             }
+        }
+    }
+    /**/
+    post {
+        always {
+            echo "Build finished: ${currentBuild.currentResult}"
         }
     }
 }
