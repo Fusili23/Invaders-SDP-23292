@@ -107,6 +107,7 @@ public class GameScreen extends Screen {
   private boolean achievementTriggered = false;
 
 	    private GameState gameState;
+		private CollisionManager collisionManager;
 
     /**
      * Constructor, establishes the properties of the screen.
@@ -162,6 +163,7 @@ public class GameScreen extends Screen {
 	 */
 	public final void initialize() {
 		super.initialize();
+		this.collisionManager = new CollisionManager(this);
         /** Initialize the bullet Boss fired */
 		this.bossBullets = new HashSet<>();
         enemyShipFormation = new EnemyShipFormation(this.currentLevel);
@@ -288,9 +290,7 @@ public class GameScreen extends Screen {
 			}
         }
         cleanItems();
-        manageBulletShipCollisions();
-        manageShipEnemyCollisions();
-        manageItemCollisions();
+        collisionManager.manageCollisions();
 		cleanBullets();
 		draw();
 
@@ -459,6 +459,7 @@ public class GameScreen extends Screen {
         this.dropItems.removeAll(recyclable);
         ItemPool.recycle(recyclable);
     }
+
 
 	/**
 	 * Manages collisions between bullets and ships.
@@ -809,6 +810,7 @@ public class GameScreen extends Screen {
 		return distanceX < maxDistanceX && distanceY < maxDistanceY;
 	}
 
+
     /**
      * Shows an achievement popup message on the HUD.
      */
@@ -871,7 +873,7 @@ public class GameScreen extends Screen {
 		}
 	}
 
-	private void applyItemEffect(DropItem item, Ship targetShip) {
+	public void applyItemEffect(DropItem item, Ship targetShip) {
 		switch (item.getItemType()) {
 			case Heal:
 				if (targetShip.getPlayerId() == 1) gainLife(); else gainLifeP2();
@@ -956,7 +958,7 @@ public class GameScreen extends Screen {
 					bulletsToRemove.add(b);
 				}
 				/** If the bullet collides with ship */
-				else if (!this.ship.isPermanentlyDestroyed() && this.checkCollision(b, this.ship)) {
+				else if (!this.ship.isPermanentlyDestroyed() && this.collisionManager.checkCollision(b, this.ship)) {
 					if (!this.ship.isDestroyed()) {
 						this.ship.destroy();
 						this.lives--;
@@ -968,7 +970,7 @@ public class GameScreen extends Screen {
 					bulletsToRemove.add(b);
 				}
 				/** If the bullet collides with ship2 */
-				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.checkCollision(b, this.ship2)) {
+				else if (this.isTwoPlayer && !this.ship2.isPermanentlyDestroyed() && this.collisionManager.checkCollision(b, this.ship2)) {
 					if (!this.ship2.isDestroyed()) {
 						this.ship2.destroy();
 						this.livesP2--;
@@ -1024,6 +1026,40 @@ public class GameScreen extends Screen {
 				this.bulletsShot++;
 				AchievementManager.getInstance().onShotFired();
 			}
+		}
+	}
+
+	// GETTERS AND SETTERS FOR COLLISION MANAGER
+	public Set<Bullet> getBullets() { return this.bullets; }
+	public Set<DropItem> getDropItems() { return this.dropItems; }
+	public Ship getShip() { return this.ship; }
+	public Ship getShip2() { return this.ship2; }
+	public boolean isTwoPlayer() { return this.isTwoPlayer; }
+	public boolean isLevelFinished() { return this.levelFinished; }
+	public EnemyShipFormation getEnemyShipFormation() { return this.enemyShipFormation; }
+	public EnemyShipSpecialFormation getEnemyShipSpecialFormation() { return this.enemyShipSpecialFormation; }
+	public MidBoss getOmegaBoss() { return this.omegaBoss; }
+	public FinalBoss getFinalBoss() { return this.finalBoss; }
+	public Cooldown getBossExplosionCooldown() { return this.bossExplosionCooldown; }
+	public Logger getLogger() { return this.logger; }
+	public Level getCurrentLevel() { return this.currentLevel; }
+	public int getLives() { return this.lives; }
+	public int getLivesP2() { return this.livesP2; }
+
+	public void addScore(int amount) { this.score += amount; }
+	public void addScoreP2(int amount) { this.scoreP2 += amount; }
+	public void addCoin(int amount) { this.coin += amount; }
+	public void increaseShipsDestroyed() { this.shipsDestroyed++; }
+	public void decreaseLives() {
+		this.lives--;
+		if (this.lives <= 0) {
+			this.ship.permanentlyDestroy();
+		}
+	}
+	public void decreaseLivesP2() {
+		this.livesP2--;
+		if (this.livesP2 <= 0) {
+			this.ship2.permanentlyDestroy();
 		}
 	}
 }
