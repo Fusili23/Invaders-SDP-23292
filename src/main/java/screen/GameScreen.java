@@ -323,6 +323,17 @@ public class GameScreen extends Screen {
 					showAchievement(unlockedLevelAchievement);
 					this.logger.info("Achievement unlocked: " + unlockedLevelAchievement);
 				}
+				if (this.isTwoPlayer) {
+					String coop = AchievementManager.getInstance().checkCoopLevelFinished(
+							this.level,
+							this.lives,
+							this.livesP2,
+							this.maxLives,
+							this.score,
+							this.scoreP2
+					);
+					if (coop != null) showAchievement(coop);
+				}
 			}
 		}
 		if (this.levelFinished && this.screenFinishedCooldown.checkFinished()) {
@@ -499,6 +510,13 @@ public class GameScreen extends Screen {
 						}
 						this.coin += (pts / 10);
 						this.shipsDestroyed++;
+						if (this.isTwoPlayer) {
+							String tycoon = AchievementManager.getInstance().checkTycoonCouple(this.coin);
+							if (tycoon != null) showAchievement(tycoon);
+
+							String mom = AchievementManager.getInstance().checkTheMomAchievement(this.score, this.scoreP2);
+							if (mom != null) showAchievement(mom);
+						}
 
 						String unlockAchievementName = AchievementManager.getInstance().onEnemyDefeated();
 						if (unlockAchievementName != null){
@@ -600,6 +618,12 @@ public class GameScreen extends Screen {
 						if (AchievementManager.getInstance().unlockAchievement("Boss Slayer")){
 							showAchievement("Boss Slayer");
 						}	/**popup achievement at gamescrean when player kill boss **/
+						if (this.isTwoPlayer) {
+							int killerId = (ownerId != null && ownerId == 2) ? 2 : 1;
+
+							String brother = AchievementManager.getInstance().checkBrotherhood(killerId, this.lives, this.livesP2);
+							if (brother != null) showAchievement(brother);
+						}
 					}
 					recyclable.add(bullet);
 				}
