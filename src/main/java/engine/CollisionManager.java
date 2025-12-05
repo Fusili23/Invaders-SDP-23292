@@ -173,7 +173,7 @@ public class CollisionManager {
     private void tryDropItem(EnemyShip enemyShip) {
         List<engine.level.ItemDrop> potentialDrops = new ArrayList<>();
         for (engine.level.ItemDrop itemDrop : gameScreen.getCurrentLevel().getItemDrops()) {
-            if (enemyShip.getEnemyType().equals(itemDrop.getEnemyType())) {
+            if (enemyShip.getEnemyType() != null && enemyShip.getEnemyType().equals(itemDrop.getEnemyType())) {
                 potentialDrops.add(itemDrop);
             }
         }
