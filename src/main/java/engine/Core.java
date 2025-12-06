@@ -167,6 +167,7 @@ public final class Core {
                             + " title screen at " + GameConfig.FPS + " fps.");
                     returnCode = frame.setScreen(currentScreen);
                     LOGGER.info("Closing title screen.");
+					break;
                 default:
                     break;
             }
