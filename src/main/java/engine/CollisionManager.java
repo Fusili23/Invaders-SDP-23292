@@ -49,7 +49,7 @@ public class CollisionManager {
             if (!gameScreen.getShip().isInvincible() && !gameScreen.getShip().isDestroyed()) {
                 gameScreen.getShip().destroy();
                 gameScreen.decreaseLives();
-                gameScreen.showHealthPopup("-1 Health (P1)");
+                gameScreen.showHealthPopup(GameConfig.P1_HEALTH_LOSS_MESSAGE);
                 logger.info("Hit on player 1 ship, " + gameScreen.getLives() + " lives remaining.");
             }
         }
@@ -58,7 +58,7 @@ public class CollisionManager {
             if (!gameScreen.getShip2().isInvincible() && !gameScreen.getShip2().isDestroyed()) {
                 gameScreen.getShip2().destroy();
                 gameScreen.decreaseLivesP2();
-                gameScreen.showHealthPopup("-1 Health (P2)");
+                gameScreen.showHealthPopup(GameConfig.P2_HEALTH_LOSS_MESSAGE);
                 logger.info("Hit on player 2 ship, " + gameScreen.getLivesP2() + " lives remaining.");
             }
         }
@@ -104,7 +104,7 @@ public class CollisionManager {
         } else {
             gameScreen.addScore(pts);
         }
-        gameScreen.addCoin(pts / 10);
+        gameScreen.addCoin(pts / GameConfig.COIN_FROM_POINTS_RATIO);
         gameScreen.increaseShipsDestroyed();
 
         String unlockAchievementName = AchievementManager.getInstance().onEnemyDefeated();
@@ -128,13 +128,13 @@ public class CollisionManager {
         } else {
             gameScreen.addScore(pts);
         }
-        gameScreen.addCoin(pts / 10);
+        gameScreen.addCoin(pts / GameConfig.COIN_FROM_POINTS_RATIO);
         gameScreen.increaseShipsDestroyed();
         gameScreen.getEnemyShipSpecialFormation().destroy(enemyShipSpecial);
     }
 
     private void handleOmegaBossHit(MidBoss omegaBoss, Integer ownerId) {
-        omegaBoss.takeDamage(2);
+        omegaBoss.takeDamage(GameConfig.OMEGA_BOSS_DAMAGE);
         if (omegaBoss.getHealPoint() <= 0) {
             int pts = omegaBoss.getPointValue();
             if (ownerId != null && ownerId == 2) {
@@ -142,7 +142,7 @@ public class CollisionManager {
             } else {
                 gameScreen.addScore(pts);
             }
-            gameScreen.addCoin(pts / 10);
+            gameScreen.addCoin(pts / GameConfig.COIN_FROM_POINTS_RATIO);
             gameScreen.increaseShipsDestroyed();
             omegaBoss.destroy();
             if (AchievementManager.getInstance().unlockAchievement("Boss Slayer")) {
@@ -153,7 +153,7 @@ public class CollisionManager {
     }
 
     private void handleFinalBossHit(FinalBoss finalBoss, Integer ownerId) {
-        finalBoss.takeDamage(1);
+        finalBoss.takeDamage(GameConfig.FINAL_BOSS_DAMAGE);
         if (finalBoss.getHealPoint() <= 0) {
             int pts = finalBoss.getPointValue();
             if (ownerId != null && ownerId == 2) {
@@ -161,7 +161,7 @@ public class CollisionManager {
             } else {
                 gameScreen.addScore(pts);
             }
-            gameScreen.addCoin(pts / 10);
+            gameScreen.addCoin(pts / GameConfig.COIN_FROM_POINTS_RATIO);
             finalBoss.destroy();
             if (AchievementManager.getInstance().unlockAchievement("Boss Slayer")) {
                 gameScreen.showAchievement("Boss Slayer");
@@ -192,7 +192,7 @@ public class CollisionManager {
                 DropItem newDropItem = ItemPool.getItem(
                         enemyShip.getPositionX() + enemyShip.getWidth() / 2,
                         enemyShip.getPositionY() + enemyShip.getHeight() / 2,
-                        2, // ITEM_DROP_SPEED
+                        GameConfig.ITEM_DROP_SPEED, // ITEM_DROP_SPEED
                         droppedType
                 );
                 gameScreen.getDropItems().add(newDropItem);
@@ -248,11 +248,11 @@ public class CollisionManager {
             ship.destroy();
             if (ship.getPlayerId() == 1) {
                 gameScreen.decreaseLives();
-                gameScreen.showHealthPopup("-1 Life (P1 Collision!)");
+                gameScreen.showHealthPopup(GameConfig.P1_COLLISION_MESSAGE);
                 logger.info("Ship 1 " + logMessage + " " + gameScreen.getLives() + " lives remaining.");
             } else {
                 gameScreen.decreaseLivesP2();
-                gameScreen.showHealthPopup("-1 Life (P2 Collision!)");
+                gameScreen.showHealthPopup(GameConfig.P2_COLLISION_MESSAGE);
                 logger.info("Ship 2 " + logMessage + " " + gameScreen.getLivesP2() + " lives remaining.");
             }
         }
