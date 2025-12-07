@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -14,14 +10,21 @@ pipeline {
 
         stage('Test') {
             steps {
-                bat 'mvn clean test'
+                bat './mvnw.cmd clean test'
             }
         }
 
-        stage('Test Reports') {
+        stage('Report') {
             steps {
                 junit 'target/surefire-reports/*.xml'
             }
         }
     }
+
+    post {
+        always {
+            echo "Build finished: ${currentBuild.currentResult}"
+        }
+    }
+    /*1STEST*/
 }
