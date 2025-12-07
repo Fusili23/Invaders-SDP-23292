@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'jdk17'
+    }
+
+    environment {
+        JAVA_HOME = tool 'jdk17'
+        PATH = "${JAVA_HOME}\\bin;${env.PATH}"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,15 +19,14 @@ pipeline {
 
         stage('Test') {
             steps {
-                // GitHub Actions랑 최대한 비슷하게
-                bat 'mvn -B clean test'
+                echo "Running tests via mvnw.cmd"
+                bat "./mvnw.cmd -B clean test"
             }
         }
 
         stage('Report') {
             steps {
-                // Maven Surefire 결과 경로
-                junit 'target/surefire-reports/*.xml'
+                echo "Tests completed"
             }
         }
     }
