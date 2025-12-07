@@ -12,6 +12,9 @@
       "enemyTypes": [
         { "type": "enemyA", "count": 20 }
       ],
+      "itemDrops": [
+        { "enemyType": "enemyA", "itemId": "Heal", "dropChance": 0.1 }
+      ],
       "completionBonus": { "currency": 10 }
     },
     {
