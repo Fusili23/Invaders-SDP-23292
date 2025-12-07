@@ -117,7 +117,7 @@ public class CollisionManager {
         gameScreen.getEnemyShipFormation().destroy(enemyShip);
 
         if (enemyType != null && gameScreen.getCurrentLevel().getItemDrops() != null) {
-            tryDropItem(enemyShip);
+            tryDropItem(enemyType, enemyShip);
         }
     }
 
@@ -170,10 +170,10 @@ public class CollisionManager {
     }
 
 
-    private void tryDropItem(EnemyShip enemyShip) {
+    private void tryDropItem(String enemyType, EnemyShip enemyShip) {
         List<engine.level.ItemDrop> potentialDrops = new ArrayList<>();
         for (engine.level.ItemDrop itemDrop : gameScreen.getCurrentLevel().getItemDrops()) {
-            if (enemyShip.getEnemyType() != null && enemyShip.getEnemyType().equals(itemDrop.getEnemyType())) {
+            if (enemyType.equals(itemDrop.getEnemyType())) {
                 potentialDrops.add(itemDrop);
             }
         }
