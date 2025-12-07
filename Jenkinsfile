@@ -27,25 +27,37 @@ pipeline {
 
         success {
             withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
-                discordSend(
-                    webhookURL: DISCORD,
-                    title: "🎉 Jenkins 빌드 성공",
-                    description: "브랜치: ${env.BRANCH_NAME}\n빌드번호: #${env.BUILD_NUMBER}\n상태: ${currentBuild.currentResult}",
-                    link: env.BUILD_URL,
-                    result: currentBuild.currentResult
-                )
+                bat """
+curl -H "Content-Type: application/json" ^
+     -X POST ^
+     -d "{ \\
+        \\"username\\": \\"Jenkins\\", \\
+        \\"embeds\\": [{ \\
+            \\"title\\": \\"🎉 Jenkins 빌드 성공\\", \\
+            \\"description\\": \\"브랜치: ${env.BRANCH_NAME}\\n빌드번호: #${env.BUILD_NUMBER}\\n상태: ${currentBuild.currentResult}\\", \\
+            \\"color\\": 3066993 \\
+        }] \\
+     }" ^
+     %DISCORD%
+"""
             }
         }
 
         failure {
             withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
-                discordSend(
-                    webhookURL: DISCORD,
-                    title: "❌ Jenkins 빌드 실패",
-                    description: "브랜치: ${env.BRANCH_NAME}\n빌드번호: #${env.BUILD_NUMBER}\n상태: ${currentBuild.currentResult}",
-                    link: env.BUILD_URL,
-                    result: currentBuild.currentResult
-                )
+                bat """
+curl -H "Content-Type: application/json" ^
+     -X POST ^
+     -d "{ \\
+        \\"username\\": \\"Jenkins\\", \\
+        \\"embeds\\": [{ \\
+            \\"title\\": \\"❌ Jenkins 빌드 실패\\", \\
+            \\"description\\": \\"브랜치: ${env.BRANCH_NAME}\\n빌드번호: #${env.BUILD_NUMBER}\\n상태: ${currentBuild.currentResult}\\", \\
+            \\"color\\": 15158332 \\
+        }] \\
+     }" ^
+     %DISCORD%
+"""
             }
         }
     }
