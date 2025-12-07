@@ -20,10 +20,11 @@ pipeline {
             }
         }
     }
-    /**/
+
     post {
         always {
             echo "Build finished: ${currentBuild.currentResult}"
         }
     }
+    /*test1*/
 }
