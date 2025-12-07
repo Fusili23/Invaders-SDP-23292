@@ -29,15 +29,10 @@ pipeline {
             withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
                 discordSend(
                     webhookURL: DISCORD,
-                    title: "Jenkins 빌드 성공!",
-                    description: """
-브랜치 : ${env.BRANCH_NAME}
-빌드번호 : #${env.BUILD_NUMBER}
-상태 : ${currentBuild.currentResult}
-
-${env.BUILD_URL}
-""",
-                    color: 0x00ff00
+                    title: "🎉 Jenkins 빌드 성공",
+                    description: "브랜치: ${env.BRANCH_NAME}\n빌드번호: #${env.BUILD_NUMBER}\n상태: ${currentBuild.currentResult}",
+                    link: env.BUILD_URL,
+                    result: currentBuild.currentResult
                 )
             }
         }
@@ -46,15 +41,10 @@ ${env.BUILD_URL}
             withCredentials([string(credentialsId: 'Discord-Webhook', variable: 'DISCORD')]) {
                 discordSend(
                     webhookURL: DISCORD,
-                    title: "Jenkins 빌드 실패 ",
-                    description: """
-브랜치 : ${env.BRANCH_NAME}
-빌드번호 : #${env.BUILD_NUMBER}
-상태 : ${currentBuild.currentResult}
-
-${env.BUILD_URL}
-""",
-                    color: 0xff0000
+                    title: "❌ Jenkins 빌드 실패",
+                    description: "브랜치: ${env.BRANCH_NAME}\n빌드번호: #${env.BUILD_NUMBER}\n상태: ${currentBuild.currentResult}",
+                    link: env.BUILD_URL,
+                    result: currentBuild.currentResult
                 )
             }
         }
